@@ -1,7 +1,7 @@
-import { PgTable, serial, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 
 // Users Table
- const users = new PgTable("users", {
+export const users = pgTable("users", {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 100 }).notNull(),
     email: varchar("email", { length: 100 }).notNull().unique(),
@@ -9,7 +9,7 @@ import { PgTable, serial, varchar, text, timestamp, integer, boolean } from "dri
     profileImage: varchar("profile_image", { length: 255 }),
 });
 
-const projects = new PgTable("projects", {
+export const projects = pgTable("projects", {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
     description: text("description").notNull(),
@@ -19,7 +19,7 @@ const projects = new PgTable("projects", {
 });
 
 // Research Papers Table
-const researchPapers = new PgTable("research_papers", {
+export const researchPapers = pgTable("research_papers", {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
     abstract: text("abstract").notNull(),
@@ -28,7 +28,7 @@ const researchPapers = new PgTable("research_papers", {
 });
 
 // Conferences Table
-const conferences = new PgTable("conferences", {
+export const conferences = pgTable("conferences", {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 200 }).notNull(),
     location: varchar("location", { length: 200 }),
@@ -37,7 +37,7 @@ const conferences = new PgTable("conferences", {
 });
 
 // Achievements Table
-const achievements = new PgTable("achievements", {
+export const achievements = pgTable("achievements", {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
     description: text("description").notNull(),
@@ -45,7 +45,7 @@ const achievements = new PgTable("achievements", {
 });
 
 // Blog Posts Table
-const blogPosts = new PgTable("blog_posts", {
+export const blogPosts = pgTable("blog_posts", {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
     content: text("content").notNull(),
@@ -54,7 +54,7 @@ const blogPosts = new PgTable("blog_posts", {
 });
 
 // Teaching Experience Table
-const teachingExperience = new PgTable("teaching_experience", {
+export const teachingExperience = pgTable("teaching_experience", {
     id: serial("id").primaryKey(),
     subject: varchar("subject", { length: 200 }).notNull(),
     institution: varchar("institution", { length: 200 }).notNull(),
@@ -63,7 +63,7 @@ const teachingExperience = new PgTable("teaching_experience", {
 });
 
 // Awards Table
- const awards = new PgTable("awards", {
+export const awards = pgTable("awards", {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
     organization: varchar("organization", { length: 200 }).notNull(),
@@ -71,7 +71,7 @@ const teachingExperience = new PgTable("teaching_experience", {
 });
 
 // Collaborations Table
- const collaborations = new PgTable("collaborations", {
+export const collaborations = pgTable("collaborations", {
     id: serial("id").primaryKey(),
     collaboratorName: varchar("collaborator_name", { length: 200 }).notNull(),
     institution: varchar("institution", { length: 200 }),
@@ -80,15 +80,5 @@ const teachingExperience = new PgTable("teaching_experience", {
     endDate: timestamp("end_date"),
 });
 
-export default {
-    users,
-    projects,
-    researchPapers,
-    conferences,
-    achievements,
-    blogPosts,
-    teachingExperience,
-    awards,
-    collaborations,
-  };
+
   
