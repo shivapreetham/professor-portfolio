@@ -1,7 +1,7 @@
 // db.js
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import * as schema from '../utils/schema'; // Your schema file with table definitions
+import * as schema from './schema'; // Your schema file with table definitions
 
 // Use the connection URL from your environment variables
 const sql = neon(process.env.DATABASE_URL);
