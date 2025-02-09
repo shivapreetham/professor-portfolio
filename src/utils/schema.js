@@ -4,9 +4,10 @@ import { pgTable, serial, varchar, text, timestamp, integer, boolean } from "dri
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 100 }).notNull(),
-    email: varchar("email", { length: 100 }).notNull().unique(),
-    password: varchar("password", { length: 100 }).notNull(),
+    email: varchar("email", { length: 100 }).notNull(),
+    // password: varchar("password", { length: 100 }).notNull(),
     profileImage: varchar("profile_image", { length: 255 }),
+    bio: text("bio"),
 });
 
 export const projects = pgTable("projects", {
