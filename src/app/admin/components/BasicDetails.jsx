@@ -1,5 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Camera } from 'lucide-react';
+import { eq } from 'drizzle-orm';
+import { db } from '@/utils/db';
+import { user } from '@/utils/schema';
 
 const BasicDetail = ({ userInfo }) => {
   const [details, setDetails] = useState({
@@ -18,8 +21,11 @@ const BasicDetail = ({ userInfo }) => {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(async () => {
       try {
-        // Simulated db update - replace with your actual implementation
-        console.log('Saving:', fieldName, value);
+        const result = await db.update(user)
+          .set({ [fieldName]: value })
+          .where(eq(user.id, "1")); // Since user ID is always 1
+          
+        console.log('Updated:', fieldName, result);
       } catch (error) {
         console.error('Error saving changes:', error);
       }
