@@ -3,8 +3,7 @@ import React from 'react';
 import BasicDetails from './BasicDetails';
 import ProjectSection from '@/app/admin/components/addSections/Project/ProjectSection';
 import { useUser } from '../Provider';
-import { user } from '@/utils/schema';
-
+import ResearchPaperSection from '@/app/admin/components/addSections/ResearchPapers/researchPaperSection';
 const FormContent = () => {
   const userData = useUser();
   const userInfo = userData?.user;
@@ -28,10 +27,10 @@ const FormContent = () => {
           <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
           <BasicDetails userInfo={userInfo} />
         </section>
-
         <div className="divider"></div>
-
         <ProjectSection />
+        <div className="divider"></div>
+        <ResearchPaperSection />
       </div>
     </div>
   );
