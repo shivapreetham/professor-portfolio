@@ -21,7 +21,7 @@ const FormContent = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-4">
+    <div className="max-w-4xl mx-auto px-4 py-4 overflow-auto">
       <div className="space-y-8">
         <section>
           <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>

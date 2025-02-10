@@ -1,8 +1,8 @@
-// components/ProjectSection/index.jsx
 import React from 'react';
 import AddProject from './AddProject';
 import ProjectListEdit from './ProjectListEdit';
 import { useProjects } from './useProject';
+import { Toaster, toast } from 'react-hot-toast';
 
 const ProjectSection = () => {
   const {
@@ -18,6 +18,9 @@ const ProjectSection = () => {
     openAddModal,
     closeAddModal
   } = useProjects();
+
+  const showError = () => toast.error('Failed to complete the operation. Please try again.');
+  const showSuccess = () => toast.success('Operation completed successfully!');
 
   return (
     <section>
@@ -56,27 +59,8 @@ const ProjectSection = () => {
           onProjectAdded={handleProjectAdded}
         />
       )}
-
-      {/* Toast Modals */}
-      <dialog id="error-toast" className="modal modal-bottom sm:modal-middle">
-        <form method="dialog" className="modal-box bg-error text-error-content">
-          <h3 className="font-bold text-lg">Error</h3>
-          <p className="py-4">Failed to complete the operation. Please try again.</p>
-          <div className="modal-action">
-            <button className="btn">Close</button>
-          </div>
-        </form>
-      </dialog>
-
-      <dialog id="success-toast" className="modal modal-bottom sm:modal-middle">
-        <form method="dialog" className="modal-box bg-success text-success-content">
-          <h3 className="font-bold text-lg">Success</h3>
-          <p className="py-4">Operation completed successfully!</p>
-          <div className="modal-action">
-            <button className="btn">Close</button>
-          </div>
-        </form>
-      </dialog>
+      
+      <Toaster position="bottom-right" />
     </section>
   );
 };
