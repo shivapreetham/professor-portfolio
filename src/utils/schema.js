@@ -9,8 +9,9 @@ export const user = pgTable("user", {
     email: varchar("email", { length: 100 }).notNull(),
     profileImage: varchar("profile_image", { length: 255 }),
     bio: text("bio"),
+    location: varchar("location", { length: 100 }),
+    linkedIn: varchar("linkedin", { length: 255 })
 });
-
 // User Relations
 export const usersRelations = relations(user, ({ many }) => ({
     projects: many(projects),

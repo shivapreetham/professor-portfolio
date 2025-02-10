@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, linkedIn, location } from 'lucide-react';
 import { eq } from 'drizzle-orm';
 import { db } from '@/utils/db';
 import { user } from '@/utils/schema';
@@ -11,7 +11,9 @@ const BasicDetail = ({ userInfo }) => {
     name: userInfo?.name || '',
     email: userInfo?.email || '',
     profileImage: userInfo?.profileImage || '',
-    bio: userInfo?.bio || ''
+    bio: userInfo?.bio || '',
+    location: userInfo?.location || '',
+    linkedIn: userInfo?.linkedIn || ''
   });
   
   const timeoutRef = useRef(null);
@@ -57,23 +59,8 @@ const BasicDetail = ({ userInfo }) => {
               </div>
             </div>
             
-            <div className="flex-1">
-              <label className="label">
-                <span className="label-text text-xs text-base-content/70">Profile Image URL</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Enter image URL"
-                className="input input-bordered input-sm w-full bg-base-100 text-base-content/80"
-                value={details.profileImage}
-                onChange={(e) => onInputChange(e, 'profileImage')}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
             <div>
-              <label className="label">
+              <label className="label flex-1">
                 <span className="label-text text-xs text-base-content/70">Full Name</span>
               </label>
               <input
@@ -84,6 +71,10 @@ const BasicDetail = ({ userInfo }) => {
                 onChange={(e) => onInputChange(e, 'name')}
               />
             </div>
+          </div>
+
+          <div className="space-y-4">
+            
 
             <div>
               <label className="label">
@@ -109,6 +100,31 @@ const BasicDetail = ({ userInfo }) => {
                 onChange={(e) => onInputChange(e, 'bio')}
               />
             </div>
+            <div>
+          <label className="label">
+            <span className="label-text text-xs text-base-content/70">Location</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter your location"
+            className="input input-bordered input-sm w-full bg-base-100 text-base-content/80"
+            value={details.location}
+            onChange={(e) => onInputChange(e, 'location')}
+          />
+        </div>
+
+        <div>
+          <label className="label">
+            <span className="label-text text-xs text-base-content/70">LinkedIn Profile</span>
+          </label>
+          <input
+            type="url"
+            placeholder="Enter your LinkedIn URL"
+            className="input input-bordered input-sm w-full bg-base-100 text-base-content/80"
+            value={details.linkedIn}
+            onChange={(e) => onInputChange(e, 'linkedIn')}
+          />
+        </div>
           </div>
         </form>
       </div>
