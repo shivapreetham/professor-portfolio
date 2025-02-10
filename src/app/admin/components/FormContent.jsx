@@ -1,22 +1,39 @@
-import React from 'react'
-import BasicDetails from './BasicDetails'
-import { useUser } from '../Provider'
-const FormContent = () => {
-  const userInfo = useUser()
+// components/FormContent.jsx
+import React from 'react';
+import BasicDetails from './BasicDetails';
+import ProjectSection from '@/app/admin/components/addSections/Project/ProjectSection';
+import { useUser } from '../Provider';
 
-  if (!userInfo) return (
-    <div className="card w-full max-w-3xl mx-auto bg-base-300 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title text-base mb-4 text-base-content/80">Personal Information</h2>
-        <p>Loading...</p>
+const FormContent = () => {
+  const userInfo = useUser();
+
+  if (!userInfo) {
+    return (
+      <div className="card w-full max-w-3xl mx-auto bg-base-300 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title text-base mb-4 text-base-content/80">
+            Personal Information
+          </h2>
+          <p>Loading user information...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="space-y-8">
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
+          <BasicDetails userInfo={userInfo} />
+        </section>
+
+        <div className="divider"></div>
+
+        <ProjectSection />
       </div>
     </div>
-  )
-  return (
-    <div>
-      <BasicDetails userInfo={userInfo} />
-    </div>
-  )
-}
+  );
+};
 
-export default FormContent
+export default FormContent;

@@ -1,6 +1,7 @@
 import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createId } from '@paralleldrive/cuid2';
+import { integer } from "drizzle-orm/sqlite-core";
 
 // Users Table
 export const user = pgTable("user", {
@@ -28,9 +29,10 @@ export const usersRelations = relations(user, ({ many }) => ({
 export const projects = pgTable("projects", {
     id: text("id").primaryKey().$defaultFn(() => createId()),
     userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    collaborators: text("collaborators"),
     title: varchar("title", { length: 200 }).notNull(),
     description: text("description").notNull(),
-    imageUrl: varchar("image_url", { length: 255 }),
+    banner: varchar("banner", { length: 255 }),
     videoUrl: varchar("video_url", { length: 255 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
