@@ -64,14 +64,14 @@ export const researchPapersRelations = relations(researchPapers, ({ one }) => ({
 }));
 
 // Conferences Table
-export const conferences = pgTable("conferences", {
-    id: text("id").primaryKey().$defaultFn(() => createId()),
-    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
-    name: varchar("name", { length: 200 }).notNull(),
-    location: varchar("location", { length: 200 }),
-    date: timestamp("date").notNull(),
-    paperPresented: boolean("paper_presented").default(false),
-});
+    export const conferences = pgTable("conferences", {
+        id: text("id").primaryKey().$defaultFn(() => createId()),
+        userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+        name: varchar("name", { length: 200 }).notNull(),
+        location: varchar("location", { length: 200 }),
+        date: timestamp("date").notNull(),
+        paperPresented: boolean("paper_presented").default(false),
+    });
 
 // Conferences Relations
 export const conferencesRelations = relations(conferences, ({ one }) => ({

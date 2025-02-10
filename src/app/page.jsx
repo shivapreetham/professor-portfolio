@@ -104,7 +104,7 @@ export default function Home() {
             </div>
           </section>
         )}
-
+       
         {/* Research Papers */}
         {userData.researchPapers.length > 0 && (
           <section className="bg-base-100 rounded-box p-8">
@@ -134,7 +134,44 @@ export default function Home() {
             </div>
           </section>
         )}
-
+         {userData.conferences.length > 0 && (
+  <section className="py-12">
+    <h2 className="text-3xl font-bold text-center mb-12">
+      Conference Appearances
+    </h2>
+    <div className="flex flex-col gap-6">
+      {userData.conferences.map((conference) => (
+        <div key={conference.id} 
+             className="group relative bg-base-100 rounded-lg shadow-lg overflow-hidden">
+          <div className="absolute top-0 left-0 w-2 h-full bg-primary"></div>
+          <div className="p-6 pl-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                  {conference.name}
+                </h3>
+                {conference.paperPresented && (
+                  <div className="badge badge-primary mt-2">Paper Presented</div>
+                )}
+              </div>
+              
+              <div className="flex flex-col items-end gap-2">
+                {conference.location && (
+                  <div className="badge badge-lg badge-outline p-4">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {conference.location}
+                  </div>
+                )}
+                <p className="text-sm opacity-70">
+                  {new Date(conference.date).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+       ))}
+      </div>
+      </section>)}
         {/* Blog Posts */}
         {userData.blogPosts.length > 0 && (
           <section>
