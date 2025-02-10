@@ -8,7 +8,7 @@ export const AchievementListEdit = ({
 }) => {
   if (!achievementList?.length) {
     return (
-      <div className="text-center py-8 bg-base-200 rounded-lg">
+      <div className="text-center py-8 bg-zinc-300 rounded-lg">
         <Trophy className="w-12 h-12 mx-auto text-base-content/50 mb-4" />
         <p className="text-base-content/60">No achievements added yet</p>
       </div>
@@ -20,7 +20,7 @@ export const AchievementListEdit = ({
       {achievementList.map((achievement) => (
         <div 
           key={achievement.id} 
-          className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+          className="card bg-base-300 shadow-md hover:shadow-lg transition-shadow"
         >
           <div className="card-body">
             <div className="flex justify-between items-start">

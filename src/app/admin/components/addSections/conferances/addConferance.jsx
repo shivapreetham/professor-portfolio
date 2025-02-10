@@ -78,7 +78,7 @@ export const AddConference = ({ isOpen, onClose, editingConference, onConference
     if (!isOpen) return null;
   
     return (
-      <div className="card bg-base-300 shadow-lg max-w-2xl mt-5">
+      <div className="card bg-zinc-900 shadow-lg max-w-2xl mt-5">
         <div className="card-body p-4">
           <form onSubmit={handleSubmit} className="space-y-3">
             <h3 className="card-title text-base mb-2">
