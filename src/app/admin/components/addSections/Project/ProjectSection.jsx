@@ -19,9 +19,6 @@ const ProjectSection = () => {
     closeAddModal
   } = useProjects();
 
-  const showError = () => toast.error('Failed to complete the operation. Please try again.');
-  const showSuccess = () => toast.success('Operation completed successfully!');
-
   return (
     <section>
       <div className="flex justify-between items-center mb-6">

@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Provider from "./admin/Provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,15 +19,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    // <ClerkProvider
-      // publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY} 
-    // >
+
       <html lang="en">
+        <Provider>
         <body data-theme="dark">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
         </body>
         </body>
+        </Provider>
       </html>
   );
 }
