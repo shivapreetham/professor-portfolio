@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { Camera, linkedIn, location } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { eq } from 'drizzle-orm';
 import { db } from '@/utils/db';
 import { user } from '@/utils/schema';
 import { toast } from 'react-hot-toast';
+import { uploadImage } from '@/utils/uploadImage'; // Import the uploadImage function
 
 const BasicDetail = ({ userInfo }) => {
-  console.log(userInfo);
   const [details, setDetails] = useState({
     name: userInfo?.name || '',
     email: userInfo?.email || '',
@@ -16,7 +16,9 @@ const BasicDetail = ({ userInfo }) => {
     linkedIn: userInfo?.linkedIn || ''
   });
   
+  const [isUploading, setIsUploading] = useState(false);
   const timeoutRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const onInputChange = (event, fieldName) => {
     const { value } = event.target;
@@ -27,14 +29,47 @@ const BasicDetail = ({ userInfo }) => {
       try {
         const result = await db.update(user)
           .set({ [fieldName]: value })
-          .where(eq(user.id, "1")); // Since user ID is always 1
-          toast.success('Changes saved successfully!');
+          .where(eq(user.id, "1"));
+        toast.success('Changes saved successfully!');
         console.log('Updated:', fieldName, result);
       } catch (error) {
         console.error('Error saving changes:', error);
         toast.error('Failed to save changes');
       }
     }, 2000);
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const result = await uploadImage(file, {
+        bucketName: 'profile-images',
+        folderPath: 'avatars'
+      });
+
+      if (result.success) {
+        // Update state and database with new image URL
+        setDetails(prev => ({ ...prev, profileImage: result.url }));
+        await db.update(user)
+          .set({ profileImage: result.url })
+          .where(eq(user.id, "1"));
+        toast.success('Profile image updated successfully!');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error(error.message || 'Failed to upload image');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   return (
@@ -45,8 +80,23 @@ const BasicDetail = ({ userInfo }) => {
         <form className="space-y-6">
           <div className="flex items-center gap-6">
             <div className="avatar">
-              <div className="w-16 rounded-full ring ring-primary/30 ring-offset-base-100 ring-offset-2">
-                {details.profileImage ? (
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                className="hidden"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={isUploading}
+              />
+              <div 
+                className="w-16 rounded-full ring ring-primary/30 ring-offset-base-100 ring-offset-2 cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {isUploading ? (
+                  <div className="bg-base-200 w-full h-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : details.profileImage ? (
                   <img 
                     src={details.profileImage} 
                     alt="Profile"
