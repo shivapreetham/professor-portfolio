@@ -3,10 +3,11 @@ import React from 'react';
 import BasicDetails from './BasicDetails';
 import ProjectSection from '@/app/admin/components/addSections/Project/ProjectSection';
 import { useUser } from '../Provider';
+import { user } from '@/utils/schema';
 
 const FormContent = () => {
-  const userInfo = useUser();
-
+  const userData = useUser();
+  const userInfo = userData?.user;
   if (!userInfo) {
     return (
       <div className="card w-full max-w-3xl mx-auto bg-base-300 shadow-xl">

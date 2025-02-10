@@ -19,7 +19,6 @@ const AddProject = ({ isOpen, onClose, editingProject, onProjectAdded }) => {
     banner: ''
   });
 
-  // Load project data into the form when editing
   useEffect(() => {
     if (editingProject) {
       setFormData({
@@ -82,11 +81,9 @@ const AddProject = ({ isOpen, onClose, editingProject, onProjectAdded }) => {
 
     try {
       if (editingProject) {
-        // Update existing project
         await db.update(projects).set(formData).where(eq(projects.id, editingProject.id));
         toast.success('Project updated successfully!');
       } else {
-        // Insert new project (userId is hardcoded for now)
         await db.insert(projects).values({
           userId: "1",
           title: formData.title,
@@ -102,117 +99,137 @@ const AddProject = ({ isOpen, onClose, editingProject, onProjectAdded }) => {
     } catch (error) {
       console.error('Error saving project:', error);
       toast.error('Failed to save project');
-      document.getElementById('error-toast')?.showModal();
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <dialog id="add-project-modal" className="modal" open={isOpen}>
-      <form method="dialog" className="modal-box" onSubmit={handleSubmit}>
-        <h3 className="font-bold text-lg">
-          {editingProject ? 'Edit Project' : 'Add New Project'}
-        </h3>
+    <div className="card bg-base-300 shadow-lg max-w-2xl mt-5">
+      <div className="card-body p-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <h3 className="card-title text-base mb-2">
+            {editingProject ? 'Edit Project' : 'Add New Project'}
+          </h3>
 
-        {/* Banner Upload */}
-        <div className="w-full">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImageUpload}
-            className="hidden"
-            accept="image/jpeg,image/png,image/webp"
-            disabled={isUploading}
-          />
-          <div 
-            className="border-2 border-dashed border-secondary/30 rounded-lg p-3 cursor-pointer hover:border-secondary/50 transition-colors aspect-video"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {isUploading ? (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
-              </div>
-            ) : formData.banner ? (
-              <img
-                src={formData.banner}
-                alt="Project banner"
-                className="w-full h-full object-cover rounded-lg"
-                onError={(e) => {
-                  console.error('Image failed to load:', e);
-                }}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full">
-                <Camera className="w-8 h-8 opacity-40" />
-                <p className="mt-2 text-xs text-base-content/60">
-                  Click to upload banner image
-                </p>
-              </div>
-            )}
+          <div className="form-control w-full">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              className="hidden"
+              accept="image/jpeg,image/png,image/webp"
+              disabled={isUploading}
+            />
+            <div 
+              className="relative border-2 border-dashed border-accent/30 rounded-lg p-2 cursor-pointer hover:border-accent/50 transition-colors"
+              style={{ height: '160px' }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {isUploading ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="loading loading-spinner loading-sm"></span>
+                </div>
+              ) : formData.banner ? (
+                <img
+                  src={formData.banner}
+                  alt="Project banner"
+                  className="w-full h-full object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error('Image failed to load:', e);
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <Camera className="w-6 h-6 opacity-40" />
+                  <p className="mt-1 text-xs text-base-content/60">
+                    Upload banner
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Title Input */}
-        <label className="input input-bordered flex items-center gap-2 mt-4">
-          <input
-            type="text"
-            name="title"
-            className="grow"
-            placeholder="Project Title"
-            value={formData.title}
-            onChange={handleInputChange}
-            required
-          />
-        </label>
+          <div className="form-control w-full">
+            <label className="label py-1">
+              <span className="label-text text-sm">Title</span>
+            </label>
+            <input
+              type="text"
+              name="title"
+              className="input input-sm input-bordered w-full"
+              placeholder="Enter project title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
 
-        {/* Description Input */}
-        <textarea
-          name="description"
-          className="textarea textarea-bordered w-full mt-4"
-          placeholder="Project Description"
-          value={formData.description}
-          onChange={handleInputChange}
-          required
-        />
+          <div className="form-control w-full">
+            <label className="label py-1">
+              <span className="label-text text-sm">Description</span>
+            </label>
+            <textarea
+              name="description"
+              className="textarea textarea-bordered textarea-sm w-full h-20"
+              placeholder="Enter project description"
+              value={formData.description}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
 
-        {/* Collaborators Input */}
-        <label className="input input-bordered flex items-center gap-2 mt-4">
-          <input
-            type="text"
-            name="collaborators"
-            className="grow"
-            placeholder="Collaborators (optional)"
-            value={formData.collaborators}
-            onChange={handleInputChange}
-          />
-        </label>
+          <div className="form-control w-full">
+            <label className="label py-1">
+              <span className="label-text text-sm">Collaborators</span>
+            </label>
+            <input
+              type="text"
+              name="collaborators"
+              className="input input-sm input-bordered w-full"
+              placeholder="Enter collaborators (optional)"
+              value={formData.collaborators}
+              onChange={handleInputChange}
+            />
+          </div>
 
-        {/* Video URL Input */}
-        <label className="input input-bordered flex items-center gap-2 mt-4">
-          <Link2 className="w-4 h-4" />
-          <input
-            type="url"
-            name="videoUrl"
-            className="grow"
-            placeholder="Project Video URL"
-            value={formData.videoUrl}
-            onChange={handleInputChange}
-          />
-        </label>
+          <div className="form-control w-full">
+            <label className="label py-1">
+              <span className="label-text text-sm">Video URL</span>
+            </label>
+            <label className="input input-sm input-bordered flex items-center gap-2">
+              <Link2 className="w-4 h-4" />
+              <input
+                type="url"
+                name="videoUrl"
+                className="grow bg-transparent outline-none text-sm"
+                placeholder="Enter video URL"
+                value={formData.videoUrl}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
 
-        <div className="modal-action mt-6">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={isUploading}>
-            {editingProject ? 'Save Changes' : 'Add Project'}
-          </button>
-        </div>
-      </form>
-    </dialog>
+          <div className="card-actions justify-end mt-4">
+            <button
+              type="button"
+              className="btn btn-sm btn-ghost"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="btn btn-sm btn-primary"
+              disabled={isUploading}
+            >
+              {isUploading && <span className="loading loading-spinner loading-xs"></span>}
+              {editingProject ? 'Save Changes' : 'Add Project'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
