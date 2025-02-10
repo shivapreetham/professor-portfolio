@@ -135,13 +135,13 @@ export const teachingExperienceRelations = relations(teachingExperience, ({ one 
 }));
 
 // Awards Table
-export const awards = pgTable("awards", {
-    id: text("id").primaryKey().$defaultFn(() => createId()),
-    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
-    title: varchar("title", { length: 200 }).notNull(),
-    organization: varchar("organization", { length: 200 }).notNull(),
-    date: timestamp("date").notNull(),
-});
+    export const awards = pgTable("awards", {
+        id: text("id").primaryKey().$defaultFn(() => createId()),
+        userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+        title: varchar("title", { length: 200 }).notNull(),
+        organization: varchar("organization", { length: 200 }).notNull(),
+        date: timestamp("date").notNull(),
+    });
 
 // Awards Relations
 export const awardsRelations = relations(awards, ({ one }) => ({

@@ -6,7 +6,7 @@ import { useUser } from '../Provider';
 import ResearchPaperSection from '@/app/admin/components/addSections/ResearchPapers/researchPaperSection';
 import {ConferenceSection} from '@/app/admin/components/addSections/conferances/conferanceSection';
 import { BlogSection } from './addSections/blogs/blogSection';
-
+import { AchievementsSection } from './addSections/achievements/achievementSection';
 const FormContent = () => {
   const userData = useUser();
   const userInfo = userData?.user;
@@ -39,6 +39,9 @@ const FormContent = () => {
         <div className="divider"></div>
         <BlogSection />
         <div className="divider"></div>
+        <AchievementsSection />
+        <div className="divider"></div>
+
       </div>
     </div>
   );
