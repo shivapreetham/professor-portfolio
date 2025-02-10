@@ -3,8 +3,10 @@ import { Camera } from 'lucide-react';
 import { eq } from 'drizzle-orm';
 import { db } from '@/utils/db';
 import { user } from '@/utils/schema';
+import { toast } from 'react-hot-toast';
 
 const BasicDetail = ({ userInfo }) => {
+  console.log(userInfo);
   const [details, setDetails] = useState({
     name: userInfo?.name || '',
     email: userInfo?.email || '',
@@ -24,12 +26,13 @@ const BasicDetail = ({ userInfo }) => {
         const result = await db.update(user)
           .set({ [fieldName]: value })
           .where(eq(user.id, "1")); // Since user ID is always 1
-          
+          toast.success('Changes saved successfully!');
         console.log('Updated:', fieldName, result);
       } catch (error) {
         console.error('Error saving changes:', error);
+        toast.error('Failed to save changes');
       }
-    }, 1000);
+    }, 2000);
   };
 
   return (
