@@ -7,12 +7,14 @@ import {
 } from '@/utils/schema'
 import { eq } from 'drizzle-orm'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const UserContext = createContext(null);
 
 export const useUser = () => useContext(UserContext);
 
 const Provider = ({ children }) => {
+    const { user: authUser } = useAuth();
     const [userData, setUserData] = useState({
         user: null,
         projects: [],
@@ -25,7 +27,9 @@ const Provider = ({ children }) => {
         collaborations: []
     });
 
-    const getUserData = async () => {
+    const getUserData = async (userId) => {
+        if (!userId) return;
+        
         try {
             const [
                 userResult,
@@ -38,15 +42,15 @@ const Provider = ({ children }) => {
                 awardsResult,
                 collaborationsResult
             ] = await Promise.all([
-                db.select().from(user).where(eq(user.id, "1")),
-                db.select().from(projects).where(eq(projects.userId, "1")),
-                db.select().from(researchPapers).where(eq(researchPapers.userId, "1")),
-                db.select().from(conferences).where(eq(conferences.userId, "1")),
-                db.select().from(achievements).where(eq(achievements.userId, "1")),
-                db.select().from(blogPosts).where(eq(blogPosts.userId, "1")),
-                db.select().from(teachingExperience).where(eq(teachingExperience.userId, "1")),
-                db.select().from(awards).where(eq(awards.userId, "1")),
-                db.select().from(collaborations).where(eq(collaborations.userId, "1"))
+                db.select().from(user).where(eq(user.id, userId)),
+                db.select().from(projects).where(eq(projects.userId, userId)),
+                db.select().from(researchPapers).where(eq(researchPapers.userId, userId)),
+                db.select().from(conferences).where(eq(conferences.userId, userId)),
+                db.select().from(achievements).where(eq(achievements.userId, userId)),
+                db.select().from(blogPosts).where(eq(blogPosts.userId, userId)),
+                db.select().from(teachingExperience).where(eq(teachingExperience.userId, userId)),
+                db.select().from(awards).where(eq(awards.userId, userId)),
+                db.select().from(collaborations).where(eq(collaborations.userId, userId))
             ]);
 
             setUserData({
@@ -66,8 +70,10 @@ const Provider = ({ children }) => {
     };
 
     useEffect(() => {
-        getUserData();
-    }, []);
+        if (authUser?.id) {
+            getUserData(authUser.id);
+        }
+    }, [authUser]);
 
     return (
         <UserContext.Provider value={userData}>

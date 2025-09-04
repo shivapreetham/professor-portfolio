@@ -7,11 +7,14 @@ import { integer } from "drizzle-orm/sqlite-core";
 export const user = pgTable("user", {
     id: text("id").primaryKey().$defaultFn(() => createId()),
     name: varchar("name", { length: 100 }).notNull(),
-    email: varchar("email", { length: 100 }).notNull(),
+    email: varchar("email", { length: 100 }).notNull().unique(),
+    password: varchar("password", { length: 255 }).notNull(),
     profileImage: varchar("profile_image", { length: 255 }),
     bio: text("bio"),
     location: varchar("location", { length: 100 }),
-    linkedIn: varchar("linkedin", { length: 255 })
+    linkedIn: varchar("linkedin", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
 // User Relations
 export const usersRelations = relations(user, ({ many }) => ({

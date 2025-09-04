@@ -1,21 +1,37 @@
 'use client'
+import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from './admin/Provider';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Mail, Linkedin, MapPin, Download, Youtube, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { Section, SectionHeader, SectionContent } from '@/components/ui/section';
+import Navigation from '@/components/Navigation';
 
 export default function Home() {
+  const { user: authUser, loading: authLoading } = useAuth();
   const userData = useUser();
-  
+
+  if (authLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!authUser) {
+    // Show landing page for non-authenticated users
+    const LandingPage = require('@/components/LandingPage').default;
+    return <LandingPage />;
+  }
+
   if (!userData?.user) {
     return <LoadingSpinner />;
   }
 
   return (
     <div data-theme="light" className="min-h-screen bg-base-200">
+      <Navigation />
       {/* Hero Section */}
       <div className="hero min-h-[500px] hero-gradient text-primary-content relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
