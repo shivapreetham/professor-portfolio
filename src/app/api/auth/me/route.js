@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/utils/dbConnect'
+import { db } from '@/utils/db'
 import { user } from '@/utils/schema'
 import { eq } from 'drizzle-orm'
 

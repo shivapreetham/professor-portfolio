@@ -10,10 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { Section, SectionHeader, SectionContent } from '@/components/ui/section';
 import Navigation from '@/components/Navigation';
+import { useDataSync } from '@/contexts/DataSyncContext';
 
 export default function Home() {
   const { user: authUser, loading: authLoading } = useAuth();
   const userData = useUser();
+  const { registerRefreshCallback } = useDataSync();
 
   if (authLoading) {
     return <LoadingSpinner />;
@@ -28,6 +30,19 @@ export default function Home() {
   if (!userData?.user) {
     return <LoadingSpinner />;
   }
+
+  // Listen for iframe refresh messages
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data?.type === 'REFRESH_DATA') {
+        // Force re-render by updating user data
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   return (
     <div data-theme="light" className="min-h-screen bg-base-200">
@@ -193,8 +208,8 @@ export default function Home() {
                 </p>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
        ))}
       </div>
       </SectionContent>

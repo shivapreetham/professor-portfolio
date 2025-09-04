@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/utils/dbConnect'
+import { db } from '@/utils/db'
 import { 
   user, 
   projects, 

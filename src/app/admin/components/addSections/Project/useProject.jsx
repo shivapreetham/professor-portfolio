@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { projects } from '@/utils/schema';
 import { db } from '@/utils/db';
 import { desc, eq } from 'drizzle-orm';
+import { useAdminActions } from '@/hooks/useAdminActions';
 
 export const useProjects = () => {
   const [projectList, setProjectList] = useState([]);
@@ -10,6 +11,7 @@ export const useProjects = () => {
   const [error, setError] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const { deleteItem, triggerRefresh } = useAdminActions();
 
   const getProjectList = async () => {
     try {
@@ -41,20 +43,20 @@ export const useProjects = () => {
   };
 
   const handleDeleteProject = async (projectId) => {
-    try {
-      await db.delete(projects).where(eq(projects.id, projectId));
-      document.getElementById('success-toast')?.showModal();
-      getProjectList();
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      document.getElementById('error-toast')?.showModal();
-    }
+    await deleteItem(
+      async () => {
+        await db.delete(projects).where(eq(projects.id, projectId));
+        getProjectList();
+      },
+      'Project'
+    );
   };
 
   const handleProjectAdded = () => {
     getProjectList();
     setEditingProject(null);
     setIsAddModalOpen(false);
+    triggerRefresh(); // Trigger iframe refresh
     document.getElementById('success-toast')?.showModal();
   };
 

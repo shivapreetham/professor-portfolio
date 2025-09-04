@@ -8,7 +8,7 @@
   }
   
   * {
-    @apply border-border;
+    @apply border-base-300;
   }
   
   body {

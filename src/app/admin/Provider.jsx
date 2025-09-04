@@ -8,6 +8,7 @@ import {
 import { eq } from 'drizzle-orm'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useDataSync } from '@/contexts/DataSyncContext'
 
 const UserContext = createContext(null);
 
@@ -15,6 +16,7 @@ export const useUser = () => useContext(UserContext);
 
 const Provider = ({ children }) => {
     const { user: authUser } = useAuth();
+    const { registerRefreshCallback } = useDataSync();
     const [userData, setUserData] = useState({
         user: null,
         projects: [],
@@ -74,6 +76,17 @@ const Provider = ({ children }) => {
             getUserData(authUser.id);
         }
     }, [authUser]);
+
+    // Register for real-time updates
+    useEffect(() => {
+        if (authUser?.id) {
+            const unregister = registerRefreshCallback(() => {
+                getUserData(authUser.id);
+            });
+            
+            return unregister;
+        }
+    }, [authUser?.id, registerRefreshCallback]);
 
     return (
         <UserContext.Provider value={userData}>
