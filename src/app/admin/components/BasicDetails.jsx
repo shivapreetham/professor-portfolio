@@ -1,8 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Camera } from 'lucide-react';
-import { eq } from 'drizzle-orm';
-import { db } from '@/utils/db';
-import { user } from '@/utils/schema';
 import { toast } from 'react-hot-toast';
 import { uploadImage } from '@/utils/uploadImage'; // Import the uploadImage function
 
@@ -27,9 +24,23 @@ const BasicDetail = ({ userInfo }) => {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(async () => {
       try {
-        const result = await db.update(user)
-          .set({ [fieldName]: value })
-          .where(eq(user.id, "1"));
+        const response = await fetch('/api/user/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: "1",
+            fieldName,
+            value
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update');
+        }
+        
+        const result = await response.json();
         toast.success('Changes saved successfully!');
         console.log('Updated:', fieldName, result);
       } catch (error) {
@@ -54,9 +65,23 @@ const BasicDetail = ({ userInfo }) => {
       if (result.success) {
         // Update state and database with new image URL
         setDetails(prev => ({ ...prev, profileImage: result.url }));
-        await db.update(user)
-          .set({ profileImage: result.url })
-          .where(eq(user.id, "1"));
+        
+        const updateResponse = await fetch('/api/user/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: "1",
+            fieldName: 'profileImage',
+            value: result.url
+          })
+        });
+        
+        if (!updateResponse.ok) {
+          throw new Error('Failed to update profile image in database');
+        }
+        
         toast.success('Profile image updated successfully!');
       } else {
         throw new Error(result.error);

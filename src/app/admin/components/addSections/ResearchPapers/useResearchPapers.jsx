@@ -1,9 +1,7 @@
 'use client';
     
 import { useState, useEffect } from 'react';
-import { researchPapers } from '@/utils/schema';
-import { db } from '@/utils/db';
-import { desc, eq } from 'drizzle-orm';
+import { toast } from 'react-hot-toast';
 
 export const useResearchPapers = () => {
   const [papersList, setPapersList] = useState([]);
@@ -17,11 +15,12 @@ export const useResearchPapers = () => {
       setIsLoading(true);
       setError(null);
       
-      const papersListData = await db
-        .select()
-        .from(researchPapers)
-        .orderBy(desc(researchPapers.publishedAt));
-
+      const response = await fetch('/api/research-papers');
+      if (!response.ok) {
+        throw new Error('Failed to fetch research papers');
+      }
+      
+      const papersListData = await response.json();
       setPapersList(papersListData);
     } catch (error) {
       console.error('Error fetching papers list:', error);
@@ -42,7 +41,14 @@ export const useResearchPapers = () => {
 
   const handleDeletePaper = async (paperId) => {
     try {
-      await db.delete(researchPapers).where(eq(researchPapers.id, paperId));
+      const response = await fetch(`/api/research-papers?id=${paperId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete paper');
+      }
+      
       toast.success('Paper deleted successfully!');
       getPapersList();
     } catch (error) {

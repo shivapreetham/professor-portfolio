@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { FileText, Calendar, Upload, Link2 } from 'lucide-react';
-import { db } from '@/utils/db';
-import { researchPapers } from '@/utils/schema';
 import { toast } from 'react-hot-toast';
-import { eq } from 'drizzle-orm';
 import { uploadFile } from '@/utils/uploadFile'; // Import the uploadFile function
 
 export const AddResearchPaper = ({ isOpen, onClose, editingPaper, onPaperAdded }) => {
@@ -42,15 +39,10 @@ export const AddResearchPaper = ({ isOpen, onClose, editingPaper, onPaperAdded }
   };
 
   const handleFileUpload = async (event) => {
-    console.log("file got")
     const file = event.target.files?.[0];
 
     if (!file) return;
-    console.log('File selected:', {
-        name: file.name,
-        type: file.type,
-        size: file.size
-      });
+    
     if (file.type !== 'application/pdf') {
       toast.error('Please upload a PDF file');
       return;
@@ -59,14 +51,12 @@ export const AddResearchPaper = ({ isOpen, onClose, editingPaper, onPaperAdded }
     setIsUploading(true);
 
     try {
-        console.log(pdfFile)
-        console.log("sent file")
-        const result = await uploadFile(pdfFile, {
+        const result = await uploadFile(file, {
             bucketName: 'files',
             folderPath: 'pdfs',
             maxFileSize: 20 * 1024 * 1024 // 20MB
           });
-          console.log("got the result and result is-", result)
+          
       if (result.success) {
         setFormData((prev) => ({ ...prev, pdfUrl: result.url }));
         toast.success('PDF uploaded successfully!');
@@ -91,22 +81,23 @@ export const AddResearchPaper = ({ isOpen, onClose, editingPaper, onPaperAdded }
     }
 
     try {
-      if (editingPaper) {
-        await db.update(researchPapers)
-          .set({
-            ...formData,
-            publishedAt: new Date(formData.publishedAt)
-          })
-          .where(eq(researchPapers.id, editingPaper.id));
-      } else {
-        await db.insert(researchPapers).values({
-          userId: "1",
-          title: formData.title,
-          abstract: formData.abstract,
-          pdfUrl: formData.pdfUrl || null,
-          publishedAt: new Date(formData.publishedAt)
-        });
+      const method = editingPaper ? 'PUT' : 'POST';
+      const body = editingPaper ? 
+        { id: editingPaper.id, ...formData, publishedAt: new Date(formData.publishedAt) } :
+        { userId: "1", ...formData, publishedAt: new Date(formData.publishedAt) };
+
+      const response = await fetch('/api/research-papers', {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save paper');
       }
+
       onPaperAdded();
       onClose();
     } catch (error) {
