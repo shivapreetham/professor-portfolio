@@ -1,23 +1,23 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import FormContent from "./components/FormContent";
 import MobilePreview from "./components/MobilePreview";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 export default function AdminPage() {
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const auth = localStorage.getItem("admin-auth");
-    if (auth === "true") {
-      setIsAuthorized(true);
-    } else {
-      router.push("/login"); // Redirect to login if not authenticated
+    if (!loading && !user) {
+      router.push("/auth"); // Redirect to proper auth page if not authenticated
     }
-  }, [router]);
+  }, [user, loading, router]);
 
-  if (!isAuthorized) return null; // Prevent flickering before redirect
+  if (loading) return <LoadingSpinner />; // Show loading while checking auth
+  if (!user) return null; // Prevent flickering before redirect
 
   return (
     <div className="p-7">

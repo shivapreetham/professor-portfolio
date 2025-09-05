@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { uploadImage } from '@/utils/uploadImage'; // Import the uploadImage function
 
 const BasicDetail = ({ userInfo }) => {
+  const { user } = useAuth();
   const [details, setDetails] = useState({
     name: userInfo?.name || '',
     email: userInfo?.email || '',
@@ -30,7 +32,7 @@ const BasicDetail = ({ userInfo }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId: "1",
+            userId: user?.id,
             fieldName,
             value
           })
@@ -72,7 +74,7 @@ const BasicDetail = ({ userInfo }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId: "1",
+            userId: user?.id,
             fieldName: 'profileImage',
             value: result.url
           })

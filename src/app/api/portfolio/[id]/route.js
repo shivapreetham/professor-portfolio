@@ -13,9 +13,9 @@ import { eq } from 'drizzle-orm'
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params
+    const { id } = await params
 
-    // Fetch user data (without password)
+    // Fetch user data (without password) - only if published
     const userData = await db
       .select({
         id: user.id,
@@ -25,15 +25,23 @@ export async function GET(request, { params }) {
         bio: user.bio,
         location: user.location,
         linkedIn: user.linkedIn,
+        theme: user.theme,
+        primaryColor: user.primaryColor,
+        customCSS: user.customCSS,
+        heroTitle: user.heroTitle,
+        heroSubtitle: user.heroSubtitle,
+        sectionsOrder: user.sectionsOrder,
+        sectionVisibility: user.sectionVisibility,
+        isPublished: user.isPublished,
         createdAt: user.createdAt,
       })
       .from(user)
       .where(eq(user.id, id))
       .limit(1)
 
-    if (userData.length === 0) {
+    if (userData.length === 0 || !userData[0].isPublished) {
       return NextResponse.json(
-        { error: 'Portfolio not found' },
+        { error: 'Portfolio not found or not published' },
         { status: 404 }
       )
     }

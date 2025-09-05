@@ -9,7 +9,7 @@ export async function GET() {
         const conferencesData = await db
             .select()
             .from(conferences)
-            .orderBy(desc(conferences.startDate));
+            .orderBy(desc(conferences.date));
 
         return NextResponse.json(conferencesData);
     } catch (error) {

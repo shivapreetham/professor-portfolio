@@ -13,6 +13,14 @@ export const user = pgTable("user", {
     bio: text("bio"),
     location: varchar("location", { length: 100 }),
     linkedIn: varchar("linkedin", { length: 255 }),
+    theme: varchar("theme", { length: 50 }).default("light"),
+    primaryColor: varchar("primary_color", { length: 50 }).default("blue"),
+    customCSS: text("custom_css"),
+    heroTitle: text("hero_title"),
+    heroSubtitle: text("hero_subtitle"),
+    sectionsOrder: text("sections_order"),
+    sectionVisibility: text("section_visibility"),
+    isPublished: boolean("is_published").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
 });

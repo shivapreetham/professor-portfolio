@@ -9,7 +9,7 @@ export async function GET() {
         const blogsData = await db
             .select()
             .from(blogPosts)
-            .orderBy(desc(blogPosts.publishedAt));
+            .orderBy(desc(blogPosts.createdAt));
 
         return NextResponse.json(blogsData);
     } catch (error) {

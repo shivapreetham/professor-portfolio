@@ -7,6 +7,9 @@ import ResearchPaperSection from '@/app/admin/components/addSections/ResearchPap
 import {ConferenceSection} from '@/app/admin/components/addSections/conferances/conferanceSection';
 import { BlogSection } from './addSections/blogs/blogSection';
 import { AchievementsSection } from './addSections/achievements/achievementSection';
+import PublishControls from './PublishControls';
+import ThemeCustomizer from './ThemeCustomizer';
+import ContentCustomizer from './ContentCustomizer';
 const FormContent = () => {
   const userData = useUser();
   const userInfo = userData?.user;
@@ -26,9 +29,24 @@ const FormContent = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-4 overflow-auto">
       <div className="space-y-8">
+        {/* Publish Controls */}
+        <PublishControls />
+        
         <section>
           <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
           <BasicDetails userInfo={userInfo} />
+        </section>
+        <div className="divider"></div>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Theme & Customization</h2>
+          <ThemeCustomizer userInfo={userInfo} />
+        </section>
+        <div className="divider"></div>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Content & Layout</h2>
+          <ContentCustomizer userInfo={userInfo} />
         </section>
         <div className="divider"></div>
         <ProjectSection />

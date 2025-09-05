@@ -60,8 +60,191 @@ export default function PublicPortfolio() {
     return <LoadingSpinner />;
   }
 
+  const sectionsOrder = userData.user.sectionsOrder 
+    ? JSON.parse(userData.user.sectionsOrder) 
+    : ['projects', 'achievements', 'conferences', 'blogPosts', 'awards'];
+    
+  const sectionVisibility = userData.user.sectionVisibility 
+    ? JSON.parse(userData.user.sectionVisibility) 
+    : { projects: true, achievements: true, conferences: true, blogPosts: true, awards: true };
+
+  const renderProjectsSection = () => (
+    userData.projects.length > 0 && (
+      <Section className="bg-base-200">
+        <SectionContent>
+          <SectionHeader title="Research Projects" subtitle="Explore my latest research and development projects" />
+          <div className="grid lg:grid-cols-2 gap-8">
+            {userData.projects.map(project => (
+              <Card key={project.id} className="group hover:shadow-2xl transition-all duration-300">
+                {project.banner && (
+                  <figure className="relative h-56">
+                    <img 
+                      src={project.banner} 
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {project.videoUrl && (
+                      <a href={project.videoUrl} target="_blank" rel="noopener noreferrer"
+                         className="absolute bottom-4 right-4">
+                        <Button variant="error" size="sm" className="gap-2">
+                          <Youtube className="w-4 h-4" />
+                          Watch Demo
+                        </Button>
+                      </a>
+                    )}
+                  </figure>
+                )}
+                <CardContent>
+                  <CardTitle>{project.title}</CardTitle>
+                  <p className="text-base-content/80 line-clamp-3 mb-4">{project.description}</p>
+                  {project.collaborators && (
+                    <div className="flex gap-2 text-sm text-base-content/70">
+                      <span className="font-medium">Collaborators:</span>
+                      <span>{project.collaborators}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </SectionContent>
+      </Section>
+    )
+  );
+
+  const renderAchievementsSection = () => (
+    userData.achievements?.length > 0 && (
+      <Section>
+        <SectionContent>
+          <SectionHeader title="Achievements" subtitle="Notable accomplishments and milestones" />
+          <div className="grid lg:grid-cols-2 gap-6">
+            {userData.achievements.map(achievement => (
+              <Card key={achievement.id} className="hover:shadow-xl transition-all duration-300">
+                <CardContent>
+                  <CardTitle className="text-lg">{achievement.title}</CardTitle>
+                  <p className="text-base-content/80 mb-3">{achievement.description}</p>
+                  <p className="text-sm text-base-content/60">
+                    {new Date(achievement.date).toLocaleDateString()}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </SectionContent>
+      </Section>
+    )
+  );
+
+  const renderConferencesSection = () => (
+    userData.conferences?.length > 0 && (
+      <Section className="bg-base-200">
+        <SectionContent>
+          <SectionHeader title="Conferences" subtitle="Speaking engagements and presentations" />
+          <div className="grid lg:grid-cols-2 gap-6">
+            {userData.conferences.map(conference => (
+              <Card key={conference.id} className="hover:shadow-xl transition-all duration-300">
+                <CardContent>
+                  <CardTitle className="text-lg">{conference.name}</CardTitle>
+                  <div className="space-y-2 text-sm text-base-content/70">
+                    {conference.location && (
+                      <p className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        {conference.location}
+                      </p>
+                    )}
+                    <p>{new Date(conference.date).toLocaleDateString()}</p>
+                    {conference.paperPresented && (
+                      <Badge variant="secondary" size="sm">Paper Presented</Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </SectionContent>
+      </Section>
+    )
+  );
+
+  const renderBlogPostsSection = () => (
+    userData.blogPosts?.length > 0 && (
+      <Section>
+        <SectionContent>
+          <SectionHeader title="Blog Posts" subtitle="Thoughts, insights, and technical articles" />
+          <div className="grid lg:grid-cols-2 gap-8">
+            {userData.blogPosts.map(post => (
+              <Card key={post.id} className="group hover:shadow-2xl transition-all duration-300">
+                {post.imageUrl && (
+                  <figure className="relative h-56">
+                    <img 
+                      src={post.imageUrl} 
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </figure>
+                )}
+                <CardContent>
+                  <CardTitle>{post.title}</CardTitle>
+                  <p className="text-base-content/80 line-clamp-3 mb-4">{post.content}</p>
+                  <p className="text-sm text-base-content/60">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </SectionContent>
+      </Section>
+    )
+  );
+
+  const renderAwardsSection = () => (
+    userData.awards?.length > 0 && (
+      <Section className="bg-base-200">
+        <SectionContent>
+          <SectionHeader title="Awards" subtitle="Recognition and honors received" />
+          <div className="grid lg:grid-cols-2 gap-6">
+            {userData.awards.map(award => (
+              <Card key={award.id} className="hover:shadow-xl transition-all duration-300">
+                <CardContent>
+                  <CardTitle className="text-lg">{award.title}</CardTitle>
+                  <p className="text-base-content/70 mb-2">{award.organization}</p>
+                  <p className="text-sm text-base-content/60">
+                    {new Date(award.date).toLocaleDateString()}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </SectionContent>
+      </Section>
+    )
+  );
+
+  const sectionComponents = {
+    projects: renderProjectsSection,
+    achievements: renderAchievementsSection,
+    conferences: renderConferencesSection,
+    blogPosts: renderBlogPostsSection,
+    awards: renderAwardsSection
+  };
+
+  const renderSections = () => {
+    return sectionsOrder
+      .filter(sectionKey => sectionVisibility[sectionKey] && sectionComponents[sectionKey])
+      .map(sectionKey => (
+        <div key={sectionKey}>
+          {sectionComponents[sectionKey]()}
+        </div>
+      ));
+  };
+
   return (
-    <div data-theme="light" className="min-h-screen bg-base-200">
+    <div data-theme={userData.user.theme || "light"} className="min-h-screen bg-base-200">
+      {/* Custom CSS injection */}
+      {userData.user.customCSS && (
+        <style jsx global>{userData.user.customCSS}</style>
+      )}
       {/* Navigation */}
       <nav className="navbar bg-base-100 shadow-sm">
         <div className="navbar-start">
@@ -100,10 +283,10 @@ export default function PublicPortfolio() {
           
           <div className="text-center lg:text-left max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              {userData.user.name}
+              {userData.user.heroTitle || userData.user.name}
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed">
-              {userData.user.bio}
+              {userData.user.heroSubtitle || userData.user.bio}
             </p>
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
               {userData.user.location && (
@@ -132,52 +315,7 @@ export default function PublicPortfolio() {
       </div>
 
       <main className="space-y-24">
-        {/* Projects Section */}
-        {userData.projects.length > 0 && (
-          <Section className="bg-base-200">
-            <SectionContent>
-              <SectionHeader title="Research Projects" subtitle="Explore my latest research and development projects" />
-            <div className="grid lg:grid-cols-2 gap-8">
-              {userData.projects.map(project => (
-                <Card key={project.id} className="group hover:shadow-2xl transition-all duration-300">
-                  {project.banner && (
-                    <figure className="relative h-56">
-                      <img 
-                        src={project.banner} 
-                        alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {project.videoUrl && (
-                        <a href={project.videoUrl} target="_blank" rel="noopener noreferrer"
-                           className="absolute bottom-4 right-4">
-                          <Button variant="error" size="sm" className="gap-2">
-                            <Youtube className="w-4 h-4" />
-                            Watch Demo
-                          </Button>
-                        </a>
-                      )}
-                    </figure>
-                  )}
-                  <CardContent>
-                    <CardTitle>{project.title}</CardTitle>
-                    <p className="text-base-content/80 line-clamp-3 mb-4">{project.description}</p>
-                    {project.collaborators && (
-                      <div className="flex gap-2 text-sm text-base-content/70">
-                        <span className="font-medium">Collaborators:</span>
-                        <span>{project.collaborators}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            </SectionContent>
-          </Section>
-        )}
-
-        {/* Continue with other sections... */}
-        {/* Research Papers, Conferences, Blog Posts, Awards, Achievements */}
-        {/* (Copy the same structure from the main page) */}
+        {renderSections()}
       </main>
     </div>
   );

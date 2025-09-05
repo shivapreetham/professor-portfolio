@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
     try {
-        const userId = params.id;
+        const { id: userId } = await params;
         
         if (!userId) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
