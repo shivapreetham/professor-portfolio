@@ -15,6 +15,13 @@
       "when": 1757008376294,
       "tag": "0001_easy_demogoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757045289786,
+      "tag": "0002_worthless_spencer_smythe",
+      "breakpoints": true
     }
   ]
 }

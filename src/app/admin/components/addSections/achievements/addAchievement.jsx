@@ -1,10 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { db } from '@/utils/db';
-import { achievements } from '@/utils/schema';
 import { toast } from 'react-hot-toast';
-import { eq } from 'drizzle-orm';
 
 export const AddAchievement = ({ isOpen, onClose, editingAchievement, onAchievementAdded }) => {
   const [formData, setFormData] = useState({
@@ -43,24 +40,26 @@ export const AddAchievement = ({ isOpen, onClose, editingAchievement, onAchievem
     }
 
     try {
-      if (editingAchievement) {
-        await db.update(achievements)
-          .set({
-            title: formData.title,
-            description: formData.description,
-            date: new Date(formData.date)
-          })
-          .where(eq(achievements.id, editingAchievement.id));
-        toast.success('Achievement updated successfully!');
-      } else {
-        await db.insert(achievements).values({
-          userId: "1",
+      const url = editingAchievement ? `/api/achievements?id=${editingAchievement.id}` : '/api/achievements';
+      const method = editingAchievement ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           title: formData.title,
           description: formData.description,
-          date: new Date(formData.date)
-        });
-        toast.success('Achievement added successfully!');
+          date: new Date(formData.date).toISOString()
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save achievement');
       }
+
+      toast.success(editingAchievement ? 'Achievement updated successfully!' : 'Achievement added successfully!');
       onAchievementAdded();
       onClose();
     } catch (error) {

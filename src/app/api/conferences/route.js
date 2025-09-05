@@ -2,6 +2,7 @@ import { db } from '@/utils/db';
 import { conferences } from '@/utils/schema';
 import { desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth-server';
 
 export async function GET() {
     try {
@@ -22,21 +23,32 @@ export async function GET() {
 
 export async function POST(request) {
     try {
+        const user = await requireAuth();
         const data = await request.json();
-        const result = await db.insert(conferences).values(data).returning();
+        
+        // Add user ID to the data
+        const conferenceData = {
+            ...data,
+            userId: user.userId
+        };
+        
+        const result = await db.insert(conferences).values(conferenceData).returning();
         return NextResponse.json(result[0], { status: 201 });
     } catch (error) {
         console.error('Error adding conference:', error);
         return NextResponse.json(
             { error: 'Failed to add conference' }, 
-            { status: 500 }
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
 
 export async function PUT(request) {
     try {
-        const { id, ...data } = await request.json();
+        const user = await requireAuth();
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+        const data = await request.json();
         
         if (!id) {
             return NextResponse.json(
@@ -56,13 +68,14 @@ export async function PUT(request) {
         console.error('Error updating conference:', error);
         return NextResponse.json(
             { error: 'Failed to update conference' }, 
-            { status: 500 }
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
 
 export async function DELETE(request) {
     try {
+        const user = await requireAuth();
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
         
@@ -79,7 +92,7 @@ export async function DELETE(request) {
         console.error('Error deleting conference:', error);
         return NextResponse.json(
             { error: 'Failed to delete conference' }, 
-            { status: 500 }
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }

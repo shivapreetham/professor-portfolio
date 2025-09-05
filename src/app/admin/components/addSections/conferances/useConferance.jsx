@@ -1,9 +1,6 @@
 // useConferences.js
 'use client'
 import { useState, useEffect } from 'react';
-import { conferences } from '@/utils/schema';
-import { db } from '@/utils/db';
-import { desc, eq } from 'drizzle-orm';
 import { toast } from 'react-hot-toast';
 
 export const useConferences = () => {
@@ -18,11 +15,12 @@ export const useConferences = () => {
       setIsLoading(true);
       setError(null);
       
-      const conferencesListData = await db
-        .select()
-        .from(conferences)
-        .orderBy(desc(conferences.date));
-
+      const response = await fetch('/api/conferences');
+      if (!response.ok) {
+        throw new Error('Failed to fetch conferences');
+      }
+      
+      const conferencesListData = await response.json();
       setConferencesList(conferencesListData);
     } catch (error) {
       console.error('Error fetching conferences list:', error);
@@ -43,7 +41,18 @@ export const useConferences = () => {
 
   const handleDeleteConference = async (conferenceId) => {
     try {
-      await db.delete(conferences).where(eq(conferences.id, conferenceId));
+      const response = await fetch('/api/conferences', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: conferenceId })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete conference');
+      }
+      
       toast.success('Conference deleted successfully!');
       getConferencesList();
     } catch (error) {

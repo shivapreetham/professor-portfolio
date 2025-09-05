@@ -1,8 +1,5 @@
 // hooks/useProjects.js
 import { useState, useEffect } from 'react';
-import { projects } from '@/utils/schema';
-import { db } from '@/utils/db';
-import { desc, eq } from 'drizzle-orm';
 import { useAdminActions } from '@/hooks/useAdminActions';
 
 export const useProjects = () => {
@@ -18,11 +15,12 @@ export const useProjects = () => {
       setIsLoading(true);
       setError(null);
       
-      const projectListData = await db
-        .select()
-        .from(projects)
-        .orderBy(desc(projects.createdAt));
-
+      const response = await fetch('/api/projects');
+      if (!response.ok) {
+        throw new Error('Failed to fetch projects');
+      }
+      
+      const projectListData = await response.json();
       setProjectList(projectListData);
     } catch (error) {
       console.error('Error fetching project list:', error);
@@ -45,7 +43,12 @@ export const useProjects = () => {
   const handleDeleteProject = async (projectId) => {
     await deleteItem(
       async () => {
-        await db.delete(projects).where(eq(projects.id, projectId));
+        const response = await fetch(`/api/projects?id=${projectId}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          throw new Error('Failed to delete project');
+        }
         getProjectList();
       },
       'Project'

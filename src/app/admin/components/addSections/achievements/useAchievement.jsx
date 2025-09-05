@@ -1,9 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { achievements } from '@/utils/schema';
-import { db } from '@/utils/db';
-import { desc, eq } from 'drizzle-orm';
 import toast from 'react-hot-toast';
 
 export const useAchievements = () => {
@@ -18,11 +15,12 @@ export const useAchievements = () => {
       setIsLoading(true);
       setError(null);
       
-      const achievementListData = await db
-        .select()
-        .from(achievements)
-        .orderBy(desc(achievements.date));
-
+      const response = await fetch('/api/achievements');
+      if (!response.ok) {
+        throw new Error('Failed to fetch achievements');
+      }
+      
+      const achievementListData = await response.json();
       setAchievementList(achievementListData);
     } catch (error) {
       console.error('Error fetching achievements:', error);
@@ -44,7 +42,12 @@ export const useAchievements = () => {
 
   const handleDeleteAchievement = async (achievementId) => {
     try {
-      await db.delete(achievements).where(eq(achievements.id, achievementId));
+      const response = await fetch(`/api/achievements?id=${achievementId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete achievement');
+      }
       toast.success('Achievement deleted successfully');
       getAchievementList();
     } catch (error) {

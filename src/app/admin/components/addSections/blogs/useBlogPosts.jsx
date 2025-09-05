@@ -2,9 +2,6 @@
 
 // useBlogPosts.js
 import { useState, useEffect } from 'react';
-import { blogPosts } from '@/utils/schema';
-import { db } from '@/utils/db';
-import { desc, eq } from 'drizzle-orm';
 import { toast } from 'react-hot-toast';
 
 export const useBlogPosts = () => {
@@ -19,11 +16,12 @@ export const useBlogPosts = () => {
       setIsLoading(true);
       setError(null);
       
-      const postsListData = await db
-        .select()
-        .from(blogPosts)
-        .orderBy(desc(blogPosts.createdAt));
-
+      const response = await fetch('/api/blogs');
+      if (!response.ok) {
+        throw new Error('Failed to fetch blog posts');
+      }
+      
+      const postsListData = await response.json();
       setPostsList(postsListData);
     } catch (error) {
       console.error('Error fetching blog posts:', error);
@@ -44,7 +42,18 @@ export const useBlogPosts = () => {
 
   const handleDeletePost = async (postId) => {
     try {
-      await db.delete(blogPosts).where(eq(blogPosts.id, postId));
+      const response = await fetch('/api/blogs', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: postId })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete post');
+      }
+      
       toast.success('Post deleted successfully!');
       getPostsList();
     } catch (error) {

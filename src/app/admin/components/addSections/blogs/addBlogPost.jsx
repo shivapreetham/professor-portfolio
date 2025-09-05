@@ -2,11 +2,8 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Link2, Camera } from 'lucide-react';
-import { db } from '@/utils/db';
-import { blogPosts } from '@/utils/schema';
 import { toast } from 'react-hot-toast';
 import { uploadImage } from '@/utils/uploadImage';
-import { eq } from 'drizzle-orm';
 
 export const AddBlogPost = ({ isOpen, onClose, editingPost, onPostAdded }) => {
   const fileInputRef = useRef(null);
@@ -75,17 +72,38 @@ export const AddBlogPost = ({ isOpen, onClose, editingPost, onPostAdded }) => {
 
     try {
       if (editingPost) {
-        await db.update(blogPosts)
-          .set(formData)
-          .where(eq(blogPosts.id, editingPost.id));
+        const response = await fetch('/api/blogs', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: editingPost.id,
+            ...formData
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update post');
+        }
         toast.success('Post updated successfully!');
       } else {
-        await db.insert(blogPosts).values({
-          userId: "1",
-          title: formData.title,
-          content: formData.content,
-          imageUrl: formData.imageUrl || null
+        const response = await fetch('/api/blogs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: "1",
+            title: formData.title,
+            content: formData.content,
+            imageUrl: formData.imageUrl || null
+          })
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to create post');
+        }
         toast.success('Post published successfully!');
       }
       onPostAdded();

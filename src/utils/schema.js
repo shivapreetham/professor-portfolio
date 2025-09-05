@@ -8,7 +8,7 @@ export const user = pgTable("user", {
     id: text("id").primaryKey().$defaultFn(() => createId()),
     name: varchar("name", { length: 100 }).notNull(),
     email: varchar("email", { length: 100 }).notNull().unique(),
-    password: varchar("password", { length: 255 }),
+    password: varchar("password", { length: 255 }).notNull(),
     profileImage: varchar("profile_image", { length: 255 }),
     bio: text("bio"),
     location: varchar("location", { length: 100 }),

@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
-import { db } from '@/utils/db';
-import { conferences } from '@/utils/schema';
-import { eq } from 'drizzle-orm';
 import { toast } from 'react-hot-toast';
 
 
@@ -52,20 +49,39 @@ export const AddConference = ({ isOpen, onClose, editingConference, onConference
   
       try {
         if (editingConference) {
-          await db.update(conferences)
-            .set({
+          const response = await fetch('/api/conferences', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: editingConference.id,
               ...formData,
               date: new Date(formData.date)
             })
-            .where(eq(conferences.id, editingConference.id));
-        } else {
-          await db.insert(conferences).values({
-            userId: "1",
-            name: formData.name,
-            location: formData.location,
-            date: new Date(formData.date),
-            paperPresented: formData.paperPresented
           });
+
+          if (!response.ok) {
+            throw new Error('Failed to update conference');
+          }
+        } else {
+          const response = await fetch('/api/conferences', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: "1",
+              name: formData.name,
+              location: formData.location,
+              date: new Date(formData.date),
+              paperPresented: formData.paperPresented
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to create conference');
+          }
         }
         onConferenceAdded();
         onClose();

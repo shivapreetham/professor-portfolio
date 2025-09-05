@@ -13,6 +13,8 @@
 # testing
 /coverage
 .claude
+.migrations
+migrations
 # next.js
 /.next/
 /out/
