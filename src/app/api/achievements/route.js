@@ -1,22 +1,24 @@
 import { db } from '@/utils/db';
 import { achievements } from '@/utils/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 
 export async function GET() {
     try {
+        const user = await requireAuth();
         const achievementsData = await db
             .select()
             .from(achievements)
+            .where(eq(achievements.userId, user.userId))
             .orderBy(desc(achievements.date));
 
         return NextResponse.json(achievementsData);
     } catch (error) {
         console.error('Error fetching achievements:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch achievements' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to fetch achievements' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -68,7 +70,7 @@ export async function PUT(request) {
         const result = await db
             .update(achievements)
             .set(updateData)
-            .where(eq(achievements.id, id))
+            .where(and(eq(achievements.id, id), eq(achievements.userId, user.userId)))
             .returning();
         
         return NextResponse.json(result[0]);
@@ -94,7 +96,7 @@ export async function DELETE(request) {
             );
         }
         
-        await db.delete(achievements).where(eq(achievements.id, id));
+        await db.delete(achievements).where(and(eq(achievements.id, id), eq(achievements.userId, user.userId)));
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Error deleting achievement:', error);

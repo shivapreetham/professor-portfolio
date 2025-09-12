@@ -65,7 +65,7 @@ const ResizableAnalyticsPanel = ({ userInfo, isOpen, onClose }) => {
 
   const handleMouseMove = (e) => {
     if (isResizing && panelRef.current) {
-      const newWidth = e.clientX;
+      const newWidth = e.clientX - 80; // Subtract 80px (20*4) to account for left-20 positioning
       if (newWidth >= 300 && newWidth <= 800) {
         setWidth(newWidth);
       }
@@ -169,17 +169,9 @@ const ResizableAnalyticsPanel = ({ userInfo, isOpen, onClose }) => {
       {/* Resizable Panel */}
       <div 
         ref={panelRef}
-        className="fixed top-0 right-0 h-full bg-base-100 shadow-2xl z-50 flex"
+        className="fixed top-0 left-20 h-full bg-base-100 shadow-2xl z-50 flex"
         style={{ width: `${width}px` }}
       >
-        {/* Resize Handle */}
-        <div 
-          className="w-1 bg-base-300 hover:bg-primary cursor-ew-resize flex-shrink-0 transition-colors"
-          onMouseDown={handleMouseDown}
-        >
-          <div className="h-full w-full"></div>
-        </div>
-        
         {/* Panel Content */}
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           {/* Header */}

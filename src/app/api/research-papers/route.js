@@ -1,23 +1,25 @@
 import { db } from '@/utils/db';
 import { researchPapers } from '@/utils/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 
 // GET - Fetch all research papers
 export async function GET() {
     try {
+        const user = await requireAuth();
         const papersListData = await db
             .select()
             .from(researchPapers)
+            .where(eq(researchPapers.userId, user.userId))
             .orderBy(desc(researchPapers.publishedAt));
 
         return NextResponse.json(papersListData);
     } catch (error) {
         console.error('Error fetching papers list:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch research papers' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to fetch research papers' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -69,7 +71,7 @@ export async function PUT(request) {
         const result = await db
             .update(researchPapers)
             .set(updateData)
-            .where(eq(researchPapers.id, id))
+            .where(and(eq(researchPapers.id, id), eq(researchPapers.userId, user.userId)))
             .returning();
         
         return NextResponse.json(result[0]);
@@ -96,7 +98,7 @@ export async function DELETE(request) {
             );
         }
         
-        await db.delete(researchPapers).where(eq(researchPapers.id, id));
+        await db.delete(researchPapers).where(and(eq(researchPapers.id, id), eq(researchPapers.userId, user.userId)));
         
         return NextResponse.json({ success: true });
     } catch (error) {

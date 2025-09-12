@@ -1,22 +1,24 @@
 import { db } from '@/utils/db';
 import { projects } from '@/utils/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 
 export async function GET() {
     try {
+        const user = await requireAuth();
         const projectsData = await db
             .select()
             .from(projects)
+            .where(eq(projects.userId, user.userId))
             .orderBy(desc(projects.createdAt));
 
         return NextResponse.json(projectsData);
     } catch (error) {
         console.error('Error fetching projects:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch projects' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to fetch projects' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -58,7 +60,7 @@ export async function PUT(request) {
         const result = await db
             .update(projects)
             .set(data)
-            .where(eq(projects.id, id))
+            .where(and(eq(projects.id, id), eq(projects.userId, user.userId)))
             .returning();
         
         return NextResponse.json(result[0]);
@@ -84,7 +86,7 @@ export async function DELETE(request) {
             );
         }
         
-        await db.delete(projects).where(eq(projects.id, id));
+        await db.delete(projects).where(and(eq(projects.id, id), eq(projects.userId, user.userId)));
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Error deleting project:', error);

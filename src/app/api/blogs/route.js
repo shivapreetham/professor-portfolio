@@ -1,22 +1,24 @@
 import { db } from '@/utils/db';
 import { blogPosts } from '@/utils/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 
 export async function GET() {
     try {
+        const user = await requireAuth();
         const blogsData = await db
             .select()
             .from(blogPosts)
+            .where(eq(blogPosts.userId, user.userId))
             .orderBy(desc(blogPosts.createdAt));
 
         return NextResponse.json(blogsData);
     } catch (error) {
         console.error('Error fetching blog posts:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch blog posts' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to fetch blog posts' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -60,7 +62,7 @@ export async function PUT(request) {
         const result = await db
             .update(blogPosts)
             .set(data)
-            .where(eq(blogPosts.id, id))
+            .where(and(eq(blogPosts.id, id), eq(blogPosts.userId, user.userId)))
             .returning();
         
         return NextResponse.json(result[0]);
@@ -86,7 +88,7 @@ export async function DELETE(request) {
             );
         }
         
-        await db.delete(blogPosts).where(eq(blogPosts.id, id));
+        await db.delete(blogPosts).where(and(eq(blogPosts.id, id), eq(blogPosts.userId, user.userId)));
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Error deleting blog post:', error);

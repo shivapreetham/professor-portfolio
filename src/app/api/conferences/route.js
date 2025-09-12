@@ -1,22 +1,24 @@
 import { db } from '@/utils/db';
 import { conferences } from '@/utils/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 
 export async function GET() {
     try {
+        const user = await requireAuth();
         const conferencesData = await db
             .select()
             .from(conferences)
+            .where(eq(conferences.userId, user.userId))
             .orderBy(desc(conferences.date));
 
         return NextResponse.json(conferencesData);
     } catch (error) {
         console.error('Error fetching conferences:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch conferences' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to fetch conferences' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -67,7 +69,7 @@ export async function PUT(request) {
         const result = await db
             .update(conferences)
             .set(updateData)
-            .where(eq(conferences.id, id))
+            .where(and(eq(conferences.id, id), eq(conferences.userId, user.userId)))
             .returning();
         
         return NextResponse.json(result[0]);
@@ -93,7 +95,7 @@ export async function DELETE(request) {
             );
         }
         
-        await db.delete(conferences).where(eq(conferences.id, id));
+        await db.delete(conferences).where(and(eq(conferences.id, id), eq(conferences.userId, user.userId)));
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Error deleting conference:', error);

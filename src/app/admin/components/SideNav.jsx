@@ -32,29 +32,11 @@ function SideNav() {
       component: 'layout'
     },
     { 
-      id: 'pages', 
-      name: "Pages", 
-      icon: Layers3,
-      component: 'pages'
-    },
-    { 
       id: 'profile', 
       name: "Profile", 
       icon: User,
       component: 'profile'
-    },
-    { 
-      id: 'seo', 
-      name: "SEO", 
-      icon: FileText,
-      component: 'seo'
-    },
-    { 
-      id: 'settings', 
-      name: "Settings", 
-      icon: Settings,
-      component: 'settings'
-    },
+    }
   ];
 
   const handleMenuClick = (menu) => {
