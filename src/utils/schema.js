@@ -45,6 +45,7 @@ export const projects = pgTable("projects", {
     description: text("description").notNull(),
     banner: varchar("banner", { length: 255 }),
     videoUrl: varchar("video_url", { length: 255 }),
+    isPreview: boolean("is_preview").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -64,6 +65,7 @@ export const researchPapers = pgTable("research_papers", {
     abstract: text("abstract").notNull(),
     pdfUrl: varchar("pdf_url", { length: 255 }),
     publishedAt: timestamp("published_at").notNull(),
+    isPreview: boolean("is_preview").default(true).notNull(),
 });
 
 // Research Papers Relations
@@ -82,6 +84,7 @@ export const researchPapersRelations = relations(researchPapers, ({ one }) => ({
         location: varchar("location", { length: 200 }),
         date: timestamp("date").notNull(),
         paperPresented: boolean("paper_presented").default(false),
+        isPreview: boolean("is_preview").default(true).notNull(),
     });
 
 // Conferences Relations
@@ -99,6 +102,7 @@ export const achievements = pgTable("achievements", {
     title: varchar("title", { length: 200 }).notNull(),
     description: text("description").notNull(),
     date: timestamp("date").notNull(),
+    isPreview: boolean("is_preview").default(true).notNull(),
 });
 
 // Achievements Relations
@@ -116,6 +120,7 @@ export const blogPosts = pgTable("blog_posts", {
     title: varchar("title", { length: 200 }).notNull(),
     content: text("content").notNull(),
     imageUrl: varchar("image_url", { length: 255 }),
+    isPreview: boolean("is_preview").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

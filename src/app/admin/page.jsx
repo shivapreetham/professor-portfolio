@@ -4,10 +4,13 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FormContent from "./components/FormContent";
 import MobilePreview from "./components/MobilePreview";
+import CustomizationSidebar from "./components/CustomizationSidebar";
 import { LoadingSpinner } from "@/components/ui/loading";
+import { useUser } from "./Provider";
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
+  const userData = useUser();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,17 +23,25 @@ export default function AdminPage() {
   if (!user) return null; // Prevent flickering before redirect
 
   return (
-    <div className="p-7">
-    <div className="grid grid-cols-1 lg:grid-cols-3">
-      {/* Left side: Form content */}
-      <div className="col-span-2"> 
-        <FormContent />
+    <div className="p-4">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+        {/* Sidebar: Theme & Content customization */}
+        <div className="xl:col-span-1">
+          <div className="sticky top-4">
+            <CustomizationSidebar userInfo={userData?.user} />
+          </div>
+        </div>
+        
+        {/* Main content: Form content */}
+        <div className="xl:col-span-2"> 
+          <FormContent />
+        </div>
+        
+        {/* Right side: Mobile preview */}
+        <div className="xl:col-span-1">
+          <MobilePreview />
+        </div>
       </div>
-      {/* Right side: Mobile preview */}
-      <div>
-        <MobilePreview />
-      </div>
-    </div>
     </div>
   );
 }

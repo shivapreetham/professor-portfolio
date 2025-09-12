@@ -2,6 +2,7 @@ import { db } from '@/utils/db';
 import { researchPapers } from '@/utils/schema';
 import { desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth-server';
 
 // GET - Fetch all research papers
 export async function GET() {
@@ -24,16 +25,24 @@ export async function GET() {
 // POST - Add new research paper
 export async function POST(request) {
     try {
+        const user = await requireAuth();
         const data = await request.json();
         
-        const result = await db.insert(researchPapers).values(data).returning();
+        // Convert date string to Date object if needed
+        const paperData = {
+            ...data,
+            userId: user.userId,
+            publishedAt: data.publishedAt ? new Date(data.publishedAt) : null
+        };
+        
+        const result = await db.insert(researchPapers).values(paperData).returning();
         
         return NextResponse.json(result[0], { status: 201 });
     } catch (error) {
         console.error('Error adding research paper:', error);
         return NextResponse.json(
-            { error: 'Failed to add research paper' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to add research paper' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -41,6 +50,7 @@ export async function POST(request) {
 // PUT - Update research paper
 export async function PUT(request) {
     try {
+        const user = await requireAuth();
         const { id, ...data } = await request.json();
         
         if (!id) {
@@ -50,9 +60,15 @@ export async function PUT(request) {
             );
         }
         
+        // Convert date string to Date object if needed
+        const updateData = {
+            ...data,
+            publishedAt: data.publishedAt ? new Date(data.publishedAt) : data.publishedAt
+        };
+        
         const result = await db
             .update(researchPapers)
-            .set(data)
+            .set(updateData)
             .where(eq(researchPapers.id, id))
             .returning();
         
@@ -60,8 +76,8 @@ export async function PUT(request) {
     } catch (error) {
         console.error('Error updating research paper:', error);
         return NextResponse.json(
-            { error: 'Failed to update research paper' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to update research paper' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }
@@ -69,6 +85,7 @@ export async function PUT(request) {
 // DELETE - Delete research paper
 export async function DELETE(request) {
     try {
+        const user = await requireAuth();
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
         
@@ -85,8 +102,8 @@ export async function DELETE(request) {
     } catch (error) {
         console.error('Error deleting research paper:', error);
         return NextResponse.json(
-            { error: 'Failed to delete research paper' }, 
-            { status: 500 }
+            { error: error.message || 'Failed to delete research paper' }, 
+            { status: error.message === 'Authentication required' ? 401 : 500 }
         );
     }
 }

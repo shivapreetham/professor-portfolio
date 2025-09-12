@@ -2,10 +2,12 @@ import React, { useState, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDataSync } from '@/contexts/DataSyncContext';
 import { uploadImage } from '@/utils/uploadImage'; // Import the uploadImage function
 
 const BasicDetail = ({ userInfo }) => {
   const { user } = useAuth();
+  const { triggerRefresh } = useDataSync();
   const [details, setDetails] = useState({
     name: userInfo?.name || '',
     email: userInfo?.email || '',
@@ -44,6 +46,7 @@ const BasicDetail = ({ userInfo }) => {
         
         const result = await response.json();
         toast.success('Changes saved successfully!');
+        triggerRefresh(); // Trigger preview refresh
         console.log('Updated:', fieldName, result);
       } catch (error) {
         console.error('Error saving changes:', error);
@@ -85,6 +88,7 @@ const BasicDetail = ({ userInfo }) => {
         }
         
         toast.success('Profile image updated successfully!');
+        triggerRefresh(); // Trigger preview refresh
       } else {
         throw new Error(result.error);
       }

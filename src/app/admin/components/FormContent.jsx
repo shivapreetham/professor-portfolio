@@ -8,8 +8,6 @@ import {ConferenceSection} from '@/app/admin/components/addSections/conferances/
 import { BlogSection } from './addSections/blogs/blogSection';
 import { AchievementsSection } from './addSections/achievements/achievementSection';
 import PublishControls from './PublishControls';
-import ThemeCustomizer from './ThemeCustomizer';
-import ContentCustomizer from './ContentCustomizer';
 const FormContent = () => {
   const userData = useUser();
   const userInfo = userData?.user;
@@ -35,18 +33,6 @@ const FormContent = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
           <BasicDetails userInfo={userInfo} />
-        </section>
-        <div className="divider"></div>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Theme & Customization</h2>
-          <ThemeCustomizer userInfo={userInfo} />
-        </section>
-        <div className="divider"></div>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Content & Layout</h2>
-          <ContentCustomizer userInfo={userInfo} />
         </section>
         <div className="divider"></div>
         <ProjectSection />

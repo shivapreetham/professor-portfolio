@@ -2,29 +2,20 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataSync } from "@/contexts/DataSyncContext";
 
 const MobilePreview = () => {
   const { user } = useAuth();
+  const { setIframeRef } = useDataSync();
   const iframeRef = useRef(null);
   const [iframeLoading, setIframeLoading] = useState(true);
 
-  // Auto-refresh iframe every 3 seconds to show live changes
+  // Register iframe with DataSync context for controlled refreshes
   useEffect(() => {
-    if (!user?.id) return;
-    
-    const interval = setInterval(() => {
-      if (iframeRef.current) {
-        // Force iframe refresh by changing src slightly
-        const iframe = iframeRef.current;
-        const currentSrc = iframe.src;
-        iframe.src = currentSrc.includes('?') 
-          ? `${currentSrc}&refresh=${Date.now()}` 
-          : `${currentSrc}?refresh=${Date.now()}`;
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [user?.id]);
+    if (iframeRef.current) {
+      setIframeRef(iframeRef.current);
+    }
+  }, [setIframeRef]);
 
   const previewUrl = user?.id 
     ? `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/preview/${user.id}`

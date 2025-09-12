@@ -2,9 +2,11 @@ import React, { useState, useRef } from 'react';
 import { Palette, Eye, Code, Save } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDataSync } from '@/contexts/DataSyncContext';
 
 const ThemeCustomizer = ({ userInfo }) => {
   const { user } = useAuth();
+  const { triggerRefresh } = useDataSync();
   const [settings, setSettings] = useState({
     theme: userInfo?.theme || 'light',
     primaryColor: userInfo?.primaryColor || 'blue',
@@ -90,6 +92,7 @@ const ThemeCustomizer = ({ userInfo }) => {
       }
       
       toast.success('Theme settings saved successfully!');
+      triggerRefresh(); // Trigger preview refresh
     } catch (error) {
       console.error('Error saving theme settings:', error);
       toast.error('Failed to save theme settings');

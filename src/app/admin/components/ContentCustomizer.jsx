@@ -2,9 +2,11 @@ import React, { useState, useRef } from 'react';
 import { Layout, Type, Eye, Save, GripVertical, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDataSync } from '@/contexts/DataSyncContext';
 
 const ContentCustomizer = ({ userInfo }) => {
   const { user } = useAuth();
+  const { triggerRefresh } = useDataSync();
   
   const [settings, setSettings] = useState({
     heroTitle: userInfo?.heroTitle || userInfo?.name || '',
@@ -73,6 +75,7 @@ const ContentCustomizer = ({ userInfo }) => {
       }
       
       toast.success('Content settings saved successfully!');
+      triggerRefresh(); // Trigger preview refresh
     } catch (error) {
       console.error('Error saving content settings:', error);
       toast.error('Failed to save content settings');

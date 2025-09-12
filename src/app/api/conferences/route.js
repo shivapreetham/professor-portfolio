@@ -26,10 +26,11 @@ export async function POST(request) {
         const user = await requireAuth();
         const data = await request.json();
         
-        // Add user ID to the data
+        // Convert date string to Date object if needed
         const conferenceData = {
             ...data,
-            userId: user.userId
+            userId: user.userId,
+            date: data.date ? new Date(data.date) : null
         };
         
         const result = await db.insert(conferences).values(conferenceData).returning();
@@ -57,9 +58,15 @@ export async function PUT(request) {
             );
         }
         
+        // Convert date string to Date object if needed
+        const updateData = {
+            ...data,
+            date: data.date ? new Date(data.date) : data.date
+        };
+        
         const result = await db
             .update(conferences)
-            .set(data)
+            .set(updateData)
             .where(eq(conferences.id, id))
             .returning();
         

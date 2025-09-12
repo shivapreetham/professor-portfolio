@@ -12,10 +12,18 @@ export default function PreviewPage() {
   useEffect(() => {
     fetchUserData()
     
-    // Auto-refresh every 2 seconds to show live changes
-    const interval = setInterval(fetchUserData, 2000)
+    // Listen for refresh messages from parent admin panel
+    const handleMessage = (event) => {
+      if (event.data?.type === 'REFRESH_DATA') {
+        fetchUserData()
+      }
+    }
     
-    return () => clearInterval(interval)
+    window.addEventListener('message', handleMessage)
+    
+    return () => {
+      window.removeEventListener('message', handleMessage)
+    }
   }, [userId])
 
   const fetchUserData = async () => {

@@ -1,6 +1,6 @@
 import { db } from '@/utils/db'
 import { user, projects, achievements, conferences, blogPosts } from '@/utils/schema'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
 export async function GET(request, { params }) {
@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
       )
     }
 
-    // Fetch user data and all their content in parallel
+    // Fetch user data and all their PREVIEW content in parallel
     const [
       userData,
       userProjects,
@@ -23,10 +23,10 @@ export async function GET(request, { params }) {
       userBlogPosts
     ] = await Promise.all([
       db.select().from(user).where(eq(user.id, userId)).limit(1),
-      db.select().from(projects).where(eq(projects.userId, userId)),
-      db.select().from(achievements).where(eq(achievements.userId, userId)),
-      db.select().from(conferences).where(eq(conferences.userId, userId)),
-      db.select().from(blogPosts).where(eq(blogPosts.userId, userId))
+      db.select().from(projects).where(and(eq(projects.userId, userId), eq(projects.isPreview, true))),
+      db.select().from(achievements).where(and(eq(achievements.userId, userId), eq(achievements.isPreview, true))),
+      db.select().from(conferences).where(and(eq(conferences.userId, userId), eq(conferences.isPreview, true))),
+      db.select().from(blogPosts).where(and(eq(blogPosts.userId, userId), eq(blogPosts.isPreview, true)))
     ])
 
     if (userData.length === 0) {

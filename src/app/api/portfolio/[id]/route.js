@@ -9,7 +9,7 @@ import {
   blogPosts, 
   awards 
 } from '@/utils/schema'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 export async function GET(request, { params }) {
   try {
@@ -46,7 +46,7 @@ export async function GET(request, { params }) {
       )
     }
 
-    // Fetch all related data in parallel
+    // Fetch all PUBLISHED related data in parallel
     const [
       userProjects,
       userResearchPapers,
@@ -55,12 +55,12 @@ export async function GET(request, { params }) {
       userBlogPosts,
       userAwards,
     ] = await Promise.all([
-      db.select().from(projects).where(eq(projects.userId, id)),
-      db.select().from(researchPapers).where(eq(researchPapers.userId, id)),
-      db.select().from(conferences).where(eq(conferences.userId, id)),
-      db.select().from(achievements).where(eq(achievements.userId, id)),
-      db.select().from(blogPosts).where(eq(blogPosts.userId, id)),
-      db.select().from(awards).where(eq(awards.userId, id)),
+      db.select().from(projects).where(and(eq(projects.userId, id), eq(projects.isPreview, false))),
+      db.select().from(researchPapers).where(and(eq(researchPapers.userId, id), eq(researchPapers.isPreview, false))),
+      db.select().from(conferences).where(and(eq(conferences.userId, id), eq(conferences.isPreview, false))),
+      db.select().from(achievements).where(and(eq(achievements.userId, id), eq(achievements.isPreview, false))),
+      db.select().from(blogPosts).where(and(eq(blogPosts.userId, id), eq(blogPosts.isPreview, false))),
+      db.select().from(awards).where(eq(awards.userId, id)), // Awards table doesn't have isPreview yet
     ])
 
     const portfolioData = {

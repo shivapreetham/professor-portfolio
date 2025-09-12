@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useDataSync } from '@/contexts/DataSyncContext';
 
 
 export const AddConference = ({ isOpen, onClose, editingConference, onConferenceAdded }) => {
+    const { triggerRefresh } = useDataSync();
     const [formData, setFormData] = useState({
       name: '',
       location: '',
@@ -84,6 +86,7 @@ export const AddConference = ({ isOpen, onClose, editingConference, onConference
           }
         }
         onConferenceAdded();
+        triggerRefresh(); // Refresh iframe preview
         onClose();
       } catch (error) {
         console.error('Error saving conference:', error);

@@ -26,10 +26,14 @@ export async function POST(request) {
         const user = await requireAuth();
         const data = await request.json();
         
-        const result = await db.insert(achievements).values({
+        // Convert date string to Date object if needed
+        const achievementData = {
             ...data,
-            userId: user.userId
-        }).returning();
+            userId: user.userId,
+            date: data.date ? new Date(data.date) : null
+        };
+        
+        const result = await db.insert(achievements).values(achievementData).returning();
         
         return NextResponse.json(result[0], { status: 201 });
     } catch (error) {
@@ -55,9 +59,15 @@ export async function PUT(request) {
             );
         }
         
+        // Convert date string to Date object if needed
+        const updateData = {
+            ...data,
+            date: data.date ? new Date(data.date) : data.date
+        };
+        
         const result = await db
             .update(achievements)
-            .set(data)
+            .set(updateData)
             .where(eq(achievements.id, id))
             .returning();
         
