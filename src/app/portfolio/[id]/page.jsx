@@ -243,7 +243,7 @@ export default function PublicPortfolio() {
     <div data-theme={userData.user.theme || "light"} className="min-h-screen bg-base-200">
       {/* Custom CSS injection */}
       {userData.user.customCSS && (
-        <style jsx global>{userData.user.customCSS}</style>
+        <style dangerouslySetInnerHTML={{ __html: userData.user.customCSS }} />
       )}
       {/* Navigation */}
       <nav className="navbar bg-base-100 shadow-sm">

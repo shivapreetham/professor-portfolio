@@ -1,7 +1,6 @@
-import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createId } from '@paralleldrive/cuid2';
-import { integer } from "drizzle-orm/sqlite-core";
 
 // Users Table
 export const user = pgTable("user", {
@@ -184,4 +183,113 @@ export const collaborationsRelations = relations(collaborations, ({ one }) => ({
         fields: [collaborations.userId],
         references: [user.id],
     }),
+}));
+
+// Portfolio Views Table - Track individual page views
+export const portfolioViews = pgTable("portfolio_views", {
+    id: text("id").primaryKey().$defaultFn(() => createId()),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    visitorId: text("visitor_id"), // Anonymous visitor identifier (UUID)
+    ipAddress: varchar("ip_address", { length: 45 }), // Support IPv6
+    userAgent: text("user_agent"),
+    referrer: text("referrer"),
+    country: varchar("country", { length: 100 }),
+    city: varchar("city", { length: 100 }),
+    device: varchar("device", { length: 50 }), // mobile, desktop, tablet
+    browser: varchar("browser", { length: 50 }),
+    os: varchar("os", { length: 50 }),
+    viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+    sessionDuration: integer("session_duration"), // in seconds
+});
+
+// Portfolio Views Relations
+export const portfolioViewsRelations = relations(portfolioViews, ({ one }) => ({
+    user: one(user, {
+        fields: [portfolioViews.userId],
+        references: [user.id],
+    }),
+}));
+
+// Visitor Sessions Table - Track visitor sessions
+export const visitorSessions = pgTable("visitor_sessions", {
+    id: text("id").primaryKey().$defaultFn(() => createId()),
+    visitorId: text("visitor_id").notNull(), // Anonymous visitor identifier
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    startTime: timestamp("start_time").defaultNow().notNull(),
+    endTime: timestamp("end_time"),
+    pagesViewed: integer("pages_viewed").default(1),
+    totalDuration: integer("total_duration").default(0), // in seconds
+    isActive: boolean("is_active").default(true),
+    ipAddress: varchar("ip_address", { length: 45 }),
+    country: varchar("country", { length: 100 }),
+    city: varchar("city", { length: 100 }),
+});
+
+// Visitor Sessions Relations
+export const visitorSessionsRelations = relations(visitorSessions, ({ one }) => ({
+    user: one(user, {
+        fields: [visitorSessions.userId],
+        references: [user.id],
+    }),
+}));
+
+// User Interactions Table - Track specific interactions
+export const userInteractions = pgTable("user_interactions", {
+    id: text("id").primaryKey().$defaultFn(() => createId()),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    visitorId: text("visitor_id"), // Anonymous visitor identifier
+    interactionType: varchar("interaction_type", { length: 50 }).notNull(), // click, download, contact, etc.
+    targetElement: varchar("target_element", { length: 100 }), // project, achievement, contact_button, etc.
+    targetId: text("target_id"), // ID of the specific item clicked
+    metadata: text("metadata"), // JSON string with additional data
+    timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+// User Interactions Relations
+export const userInteractionsRelations = relations(userInteractions, ({ one }) => ({
+    user: one(user, {
+        fields: [userInteractions.userId],
+        references: [user.id],
+    }),
+}));
+
+// Portfolio Analytics Summary Table - Aggregated stats
+export const portfolioAnalytics = pgTable("portfolio_analytics", {
+    id: text("id").primaryKey().$defaultFn(() => createId()),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    date: timestamp("date").notNull(), // Daily aggregation
+    totalViews: integer("total_views").default(0),
+    uniqueVisitors: integer("unique_visitors").default(0),
+    avgSessionDuration: integer("avg_session_duration").default(0), // in seconds
+    bounceRate: integer("bounce_rate").default(0), // percentage
+    topCountries: text("top_countries"), // JSON array of countries
+    topReferrers: text("top_referrers"), // JSON array of referrers
+    deviceBreakdown: text("device_breakdown"), // JSON object with device stats
+    popularSections: text("popular_sections"), // JSON array of most viewed sections
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+// Portfolio Analytics Relations
+export const portfolioAnalyticsRelations = relations(portfolioAnalytics, ({ one }) => ({
+    user: one(user, {
+        fields: [portfolioAnalytics.userId],
+        references: [user.id],
+    }),
+}));
+
+// Update Users Relations to include analytics
+export const usersRelationsUpdated = relations(user, ({ many }) => ({
+    projects: many(projects),
+    researchPapers: many(researchPapers),
+    conferences: many(conferences),
+    achievements: many(achievements),
+    blogPosts: many(blogPosts),
+    teachingExperience: many(teachingExperience),
+    awards: many(awards),
+    collaborations: many(collaborations),
+    portfolioViews: many(portfolioViews),
+    visitorSessions: many(visitorSessions),
+    userInteractions: many(userInteractions),
+    portfolioAnalytics: many(portfolioAnalytics),
 }));

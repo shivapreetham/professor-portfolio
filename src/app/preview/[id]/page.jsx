@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import AnalyticsTracker from '@/components/AnalyticsTracker'
 
 export default function PreviewPage() {
   const params = useParams()
@@ -63,6 +64,9 @@ export default function PreviewPage() {
 
   return (
     <div className="min-h-screen bg-base-100">
+      {/* Analytics Tracking */}
+      <AnalyticsTracker userId={userId} />
+      
       {/* Preview Banner */}
       <div className="bg-warning text-warning-content p-2 text-center text-sm font-medium">
         🔍 PREVIEW MODE - This is a draft preview, not the published portfolio
@@ -89,6 +93,8 @@ export default function PreviewPage() {
               target="_blank" 
               rel="noopener noreferrer"
               className="btn btn-outline btn-sm mt-2"
+              data-analytics="contact_link"
+              data-analytics-id="linkedin"
             >
               LinkedIn
             </a>
@@ -101,7 +107,12 @@ export default function PreviewPage() {
             <h2 className="text-3xl font-bold mb-6">Projects</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((project) => (
-                <div key={project.id} className="card bg-base-200 shadow-xl">
+                <div 
+                  key={project.id} 
+                  className="card bg-base-200 shadow-xl"
+                  data-analytics="project_card"
+                  data-analytics-id={project.id}
+                >
                   {project.banner && (
                     <figure>
                       <img src={project.banner} alt={project.title} className="h-48 w-full object-cover" />
@@ -115,7 +126,13 @@ export default function PreviewPage() {
                     )}
                     {project.videoUrl && (
                       <div className="card-actions">
-                        <a href={project.videoUrl} target="_blank" className="btn btn-primary btn-sm">
+                        <a 
+                          href={project.videoUrl} 
+                          target="_blank" 
+                          className="btn btn-primary btn-sm"
+                          data-analytics="project_demo"
+                          data-analytics-id={project.id}
+                        >
                           View Demo
                         </a>
                       </div>
@@ -133,7 +150,12 @@ export default function PreviewPage() {
             <h2 className="text-3xl font-bold mb-6">Achievements</h2>
             <div className="space-y-4">
               {achievements.map((achievement) => (
-                <div key={achievement.id} className="card bg-base-200 shadow-lg">
+                <div 
+                  key={achievement.id} 
+                  className="card bg-base-200 shadow-lg"
+                  data-analytics="achievement_card"
+                  data-analytics-id={achievement.id}
+                >
                   <div className="card-body">
                     <h3 className="card-title">{achievement.title}</h3>
                     <p>{achievement.description}</p>

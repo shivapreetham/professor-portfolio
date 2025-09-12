@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FormContent from "./components/FormContent";
 import MobilePreview from "./components/MobilePreview";
-import CustomizationSidebar from "./components/CustomizationSidebar";
+import SideNav from "./components/SideNav";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useUser } from "./Provider";
 
@@ -23,23 +23,22 @@ export default function AdminPage() {
   if (!user) return null; // Prevent flickering before redirect
 
   return (
-    <div className="p-4">
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-        {/* Sidebar: Theme & Content customization */}
-        <div className="xl:col-span-1">
-          <div className="sticky top-4">
-            <CustomizationSidebar userInfo={userData?.user} />
+    <div className="min-h-screen bg-base-100">
+      {/* Consolidated Side Navigation with All Features */}
+      <SideNav />
+      
+      {/* Main Layout - Responsive spacing for sidebar */}
+      <div className="transition-all duration-300 pl-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
+          {/* Main content: Form content - Takes more space */}
+          <div className="lg:col-span-2"> 
+            <FormContent />
           </div>
-        </div>
-        
-        {/* Main content: Form content */}
-        <div className="xl:col-span-2"> 
-          <FormContent />
-        </div>
-        
-        {/* Right side: Mobile preview */}
-        <div className="xl:col-span-1">
-          <MobilePreview />
+          
+          {/* Right side: Mobile preview */}
+          <div className="lg:col-span-1">
+            <MobilePreview />
+          </div>
         </div>
       </div>
     </div>
