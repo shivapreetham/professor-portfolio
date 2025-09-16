@@ -10,7 +10,7 @@ export async function GET() {
         const achievementsData = await db
             .select()
             .from(achievements)
-            .where(eq(achievements.userId, user.userId))
+            .where(and(eq(achievements.userId, user.userId), eq(achievements.isPreview, true)))
             .orderBy(desc(achievements.date));
 
         return NextResponse.json(achievementsData);

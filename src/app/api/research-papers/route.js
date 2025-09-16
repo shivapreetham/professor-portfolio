@@ -11,7 +11,7 @@ export async function GET() {
         const papersListData = await db
             .select()
             .from(researchPapers)
-            .where(eq(researchPapers.userId, user.userId))
+            .where(and(eq(researchPapers.userId, user.userId), eq(researchPapers.isPreview, true)))
             .orderBy(desc(researchPapers.publishedAt));
 
         return NextResponse.json(papersListData);

@@ -10,7 +10,7 @@ export async function GET() {
         const projectsData = await db
             .select()
             .from(projects)
-            .where(eq(projects.userId, user.userId))
+            .where(and(eq(projects.userId, user.userId), eq(projects.isPreview, true)))
             .orderBy(desc(projects.createdAt));
 
         return NextResponse.json(projectsData);

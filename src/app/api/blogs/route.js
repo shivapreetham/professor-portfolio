@@ -10,7 +10,7 @@ export async function GET() {
         const blogsData = await db
             .select()
             .from(blogPosts)
-            .where(eq(blogPosts.userId, user.userId))
+            .where(and(eq(blogPosts.userId, user.userId), eq(blogPosts.isPreview, true)))
             .orderBy(desc(blogPosts.createdAt));
 
         return NextResponse.json(blogsData);

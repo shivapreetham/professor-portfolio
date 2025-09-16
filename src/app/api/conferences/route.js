@@ -10,7 +10,7 @@ export async function GET() {
         const conferencesData = await db
             .select()
             .from(conferences)
-            .where(eq(conferences.userId, user.userId))
+            .where(and(eq(conferences.userId, user.userId), eq(conferences.isPreview, true)))
             .orderBy(desc(conferences.date));
 
         return NextResponse.json(conferencesData);
