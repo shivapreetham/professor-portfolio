@@ -36,6 +36,13 @@
       "when": 1757088476517,
       "tag": "0004_perpetual_the_hunter",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1759390556664,
+      "tag": "0005_brave_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

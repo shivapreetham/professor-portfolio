@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { Section, SectionHeader, SectionContent } from '@/components/ui/section';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 
 export default function PublicPortfolio() {
   const params = useParams();
@@ -70,7 +71,7 @@ export default function PublicPortfolio() {
 
   const renderProjectsSection = () => (
     userData.projects.length > 0 && (
-      <Section className="bg-base-200">
+      <Section className="bg-base-200" data-section="projects">
         <SectionContent>
           <SectionHeader title="Research Projects" subtitle="Explore my latest research and development projects" />
           <div className="grid lg:grid-cols-2 gap-8">
@@ -114,7 +115,7 @@ export default function PublicPortfolio() {
 
   const renderAchievementsSection = () => (
     userData.achievements?.length > 0 && (
-      <Section>
+      <Section data-section="achievements">
         <SectionContent>
           <SectionHeader title="Achievements" subtitle="Notable accomplishments and milestones" />
           <div className="grid lg:grid-cols-2 gap-6">
@@ -137,7 +138,7 @@ export default function PublicPortfolio() {
 
   const renderConferencesSection = () => (
     userData.conferences?.length > 0 && (
-      <Section className="bg-base-200">
+      <Section className="bg-base-200" data-section="conferences">
         <SectionContent>
           <SectionHeader title="Conferences" subtitle="Speaking engagements and presentations" />
           <div className="grid lg:grid-cols-2 gap-6">
@@ -168,7 +169,7 @@ export default function PublicPortfolio() {
 
   const renderBlogPostsSection = () => (
     userData.blogPosts?.length > 0 && (
-      <Section>
+      <Section data-section="blogPosts">
         <SectionContent>
           <SectionHeader title="Blog Posts" subtitle="Thoughts, insights, and technical articles" />
           <div className="grid lg:grid-cols-2 gap-8">
@@ -200,7 +201,7 @@ export default function PublicPortfolio() {
 
   const renderAwardsSection = () => (
     userData.awards?.length > 0 && (
-      <Section className="bg-base-200">
+      <Section className="bg-base-200" data-section="awards">
         <SectionContent>
           <SectionHeader title="Awards" subtitle="Recognition and honors received" />
           <div className="grid lg:grid-cols-2 gap-6">
@@ -259,8 +260,11 @@ export default function PublicPortfolio() {
         </div>
       </nav>
 
+      {/* Analytics Tracker */}
+      <AnalyticsTracker userId={userData.user.id} />
+
       {/* Hero Section */}
-      <div className="hero min-h-[500px] hero-gradient text-primary-content relative overflow-hidden">
+      <div className="hero min-h-[500px] hero-gradient text-primary-content relative overflow-hidden" data-section="hero">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="hero-content flex-col lg:flex-row gap-12 py-16 relative z-10">
           {userData.user.profileImage ? (

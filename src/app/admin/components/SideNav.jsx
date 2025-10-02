@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Layers3, Brush, BarChart, Settings, Palette, Layout, FileText, User } from "lucide-react";
-import ResizableAnalyticsPanel from './ResizableAnalyticsPanel';
 import ThemeCustomizer from './ThemeCustomizer';
 import ContentCustomizer from './ContentCustomizer';
 import { useUser } from '../Provider';
@@ -11,35 +11,41 @@ function SideNav() {
   const userData = useUser();
   const userInfo = userData?.user;
   const [activePanel, setActivePanel] = useState(null);
+  const router = useRouter();
 
   const menuList = [
-    { 
-      id: 'analytics', 
-      name: "Analytics", 
+    {
+      id: 'analytics',
+      name: "Analytics Overview",
       icon: BarChart,
       component: 'analytics'
     },
-    { 
-      id: 'theme', 
-      name: "Theme", 
+    {
+      id: 'theme',
+      name: "Theme",
       icon: Palette,
       component: 'theme'
     },
-    { 
-      id: 'layout', 
-      name: "Layout", 
+    {
+      id: 'layout',
+      name: "Layout",
       icon: Layout,
       component: 'layout'
     },
-    { 
-      id: 'profile', 
-      name: "Profile", 
+    {
+      id: 'profile',
+      name: "Profile",
       icon: User,
       component: 'profile'
     }
   ];
 
   const handleMenuClick = (menu) => {
+    if (menu.id === 'analytics') {
+      router.push('/admin/analytics');
+      return;
+    }
+
     if (activePanel === menu.id) {
       setActivePanel(null);
     } else {
@@ -74,13 +80,6 @@ function SideNav() {
           <div className="w-8 h-1 bg-base-content/20 rounded-full mx-auto"></div>
         </div>
       </div>
-
-      {/* Analytics Panel */}
-      <ResizableAnalyticsPanel 
-        userInfo={userInfo}
-        isOpen={activePanel === 'analytics'}
-        onClose={closePanel}
-      />
 
       {/* Theme Panel - Slide out from left */}
       {activePanel === 'theme' && (

@@ -278,6 +278,29 @@ export const portfolioAnalyticsRelations = relations(portfolioAnalytics, ({ one 
     }),
 }));
 
+// Section Time Tracking Table - Track time spent on each section
+export const sectionTimeTracking = pgTable("section_time_tracking", {
+    id: text("id").primaryKey().$defaultFn(() => createId()),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+    visitorId: text("visitor_id").notNull(),
+    sessionId: text("session_id"),
+    sectionName: varchar("section_name", { length: 100 }).notNull(),
+    timeSpent: integer("time_spent").default(0),
+    startTime: timestamp("start_time").defaultNow().notNull(),
+    endTime: timestamp("end_time"),
+    scrollDepth: integer("scroll_depth").default(0),
+    interactionCount: integer("interaction_count").default(0),
+    deviceType: varchar("device_type", { length: 50 }),
+    timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export const sectionTimeTrackingRelations = relations(sectionTimeTracking, ({ one }) => ({
+    user: one(user, {
+        fields: [sectionTimeTracking.userId],
+        references: [user.id],
+    }),
+}));
+
 // Update Users Relations to include analytics
 export const usersRelationsUpdated = relations(user, ({ many }) => ({
     projects: many(projects),
@@ -292,4 +315,5 @@ export const usersRelationsUpdated = relations(user, ({ many }) => ({
     visitorSessions: many(visitorSessions),
     userInteractions: many(userInteractions),
     portfolioAnalytics: many(portfolioAnalytics),
+    sectionTimeTracking: many(sectionTimeTracking),
 }));
