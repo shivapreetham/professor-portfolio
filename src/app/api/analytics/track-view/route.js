@@ -1,5 +1,5 @@
 import { db, withRetry } from '@/utils/db';
-import { portfolioViews, visitorSessions, portfolioAnalytics } from '@/utils/schema';
+import { portfolioViews, visitorSessions, portfolioAnalytics, userInteractions } from '@/utils/schema';
 import { eq, and, gte, lt, desc } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
@@ -127,6 +127,8 @@ export async function POST(request) {
                     pagesViewed: 1,
                     totalDuration: sessionDuration || 0,
                     ipAddress: visitorInfo.ipAddress,
+                    country: visitorInfo.country,
+                    city: visitorInfo.city,
                 });
             }
         });
@@ -240,12 +242,22 @@ export async function GET(request) {
             // Referrer breakdown
             const referrerStats = views.reduce((acc, view) => {
                 const referrer = view.referrer || 'Direct';
-                const domain = referrer === 'Direct' ? 'Direct' : 
-                    referrer.includes('google') ? 'Google' :
-                    referrer.includes('facebook') ? 'Facebook' :
-                    referrer.includes('linkedin') ? 'LinkedIn' :
-                    referrer.includes('twitter') ? 'Twitter' :
-                    new URL(referrer).hostname || 'Other';
+                let domain = 'Direct';
+
+                if (referrer !== 'Direct' && referrer !== 'direct') {
+                    if (referrer.includes('google')) domain = 'Google';
+                    else if (referrer.includes('facebook')) domain = 'Facebook';
+                    else if (referrer.includes('linkedin')) domain = 'LinkedIn';
+                    else if (referrer.includes('twitter')) domain = 'Twitter';
+                    else {
+                        try {
+                            domain = new URL(referrer).hostname || 'Other';
+                        } catch (e) {
+                            domain = 'Other';
+                        }
+                    }
+                }
+
                 acc[domain] = (acc[domain] || 0) + 1;
                 return acc;
             }, {});

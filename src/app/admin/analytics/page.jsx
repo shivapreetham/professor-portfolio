@@ -17,13 +17,14 @@ const AnalyticsPage = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const fetchAnalytics = async () => {
-    if (!userData?.id) return;
+    const userId = userData?.user?.id || userData?.id;
+    if (!userId) return;
 
     setLoading(true);
     try {
       const [generalRes, sectionRes] = await Promise.all([
-        fetch(`/api/analytics/track-view?userId=${userData.id}&days=${timeRange}`),
-        fetch(`/api/analytics/section-time?userId=${userData.id}&days=${timeRange}`)
+        fetch(`/api/analytics/track-view?userId=${userId}&days=${timeRange}`),
+        fetch(`/api/analytics/section-time?userId=${userId}&days=${timeRange}`)
       ]);
 
       if (generalRes.ok && sectionRes.ok) {
@@ -41,7 +42,7 @@ const AnalyticsPage = () => {
 
   useEffect(() => {
     fetchAnalytics();
-  }, [userData?.id, timeRange]);
+  }, [userData?.user?.id, userData?.id, timeRange]);
 
   useEffect(() => {
     if (!autoRefresh) return;
@@ -51,7 +52,7 @@ const AnalyticsPage = () => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [autoRefresh, timeRange, userData?.id]);
+  }, [autoRefresh, timeRange, userData?.user?.id, userData?.id]);
 
   const formatTime = (seconds) => {
     if (seconds < 60) return `${seconds}s`;
@@ -66,28 +67,40 @@ const AnalyticsPage = () => {
     return num.toString();
   };
 
-  const StatCard = ({ icon: Icon, title, value, change, trend, color = "primary" }) => (
-    <div className="card bg-base-200 shadow-lg">
-      <div className="card-body p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm text-base-content/60 mb-1">{title}</p>
-            <p className="text-3xl font-bold text-base-content mb-2">{value}</p>
-            {change !== undefined && (
-              <div className={`flex items-center gap-1 text-sm ${trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-base-content/60'}`}>
-                {trend === 'up' && <ArrowUp className="w-4 h-4" />}
-                {trend === 'down' && <ArrowDown className="w-4 h-4" />}
-                <span>{change}% vs previous period</span>
-              </div>
-            )}
-          </div>
-          <div className={`p-3 rounded-lg bg-${color}/10`}>
-            <Icon className={`w-6 h-6 text-${color}`} />
+  const StatCard = ({ icon: Icon, title, value, change, trend, color = "primary" }) => {
+    const colorClasses = {
+      primary: { bg: 'bg-primary/10', text: 'text-primary' },
+      success: { bg: 'bg-success/10', text: 'text-success' },
+      warning: { bg: 'bg-warning/10', text: 'text-warning' },
+      info: { bg: 'bg-info/10', text: 'text-info' },
+      error: { bg: 'bg-error/10', text: 'text-error' }
+    };
+
+    const colorClass = colorClasses[color] || colorClasses.primary;
+
+    return (
+      <div className="card bg-base-200 shadow-lg">
+        <div className="card-body p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-sm text-base-content/60 mb-1">{title}</p>
+              <p className="text-3xl font-bold text-base-content mb-2">{value}</p>
+              {change !== undefined && (
+                <div className={`flex items-center gap-1 text-sm ${trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-base-content/60'}`}>
+                  {trend === 'up' && <ArrowUp className="w-4 h-4" />}
+                  {trend === 'down' && <ArrowDown className="w-4 h-4" />}
+                  <span>{change}% vs previous period</span>
+                </div>
+              )}
+            </div>
+            <div className={`p-3 rounded-lg ${colorClass.bg}`}>
+              <Icon className={`w-6 h-6 ${colorClass.text}`} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading && !analytics) {
     return (

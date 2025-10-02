@@ -11,6 +11,7 @@ const AnalyticsTracker = ({ userId }) => {
   const currentSectionRef = useRef(null);
   const sectionStartTimeRef = useRef(null);
   const sectionInteractionsRef = useRef({});
+  const scrollTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -111,7 +112,16 @@ const AnalyticsTracker = ({ userId }) => {
         const id = target.getAttribute('data-analytics-id');
         const metadata = target.getAttribute('data-analytics-meta');
 
-        trackInteraction('click', element, id, metadata ? JSON.parse(metadata) : null);
+        let parsedMetadata = null;
+        if (metadata) {
+          try {
+            parsedMetadata = JSON.parse(metadata);
+          } catch (e) {
+            console.error('Failed to parse metadata:', e);
+          }
+        }
+
+        trackInteraction('click', element, id, parsedMetadata);
       }
 
       // Track section interactions
@@ -186,47 +196,63 @@ const AnalyticsTracker = ({ userId }) => {
     };
 
     const handleScroll = () => {
-      const scrollPercent = Math.round(
-        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
-      );
-
-      // Track major scroll milestones
-      if (scrollPercent >= 25 && !sessionStorage.getItem('scroll_25')) {
-        sessionStorage.setItem('scroll_25', 'true');
-        trackInteraction('scroll', 'page', null, { percent: 25 });
-      } else if (scrollPercent >= 50 && !sessionStorage.getItem('scroll_50')) {
-        sessionStorage.setItem('scroll_50', 'true');
-        trackInteraction('scroll', 'page', null, { percent: 50 });
-      } else if (scrollPercent >= 75 && !sessionStorage.getItem('scroll_75')) {
-        sessionStorage.setItem('scroll_75', 'true');
-        trackInteraction('scroll', 'page', null, { percent: 75 });
-      } else if (scrollPercent >= 100 && !sessionStorage.getItem('scroll_100')) {
-        sessionStorage.setItem('scroll_100', 'true');
-        trackInteraction('scroll', 'page', null, { percent: 100 });
+      // Throttle scroll events
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
 
-      // Section-based tracking
-      const sectionInView = getSectionInView();
+      scrollTimeoutRef.current = setTimeout(() => {
+        const scrollPercent = Math.round(
+          (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+        );
 
-      if (sectionInView && sectionInView !== currentSectionRef.current) {
-        // Track time for previous section
-        if (currentSectionRef.current && sectionStartTimeRef.current) {
-          const timeSpent = Math.round((Date.now() - sectionStartTimeRef.current) / 1000);
-          const scrollDepth = getSectionScrollDepth(currentSectionRef.current);
-
-          if (timeSpent > 0) {
-            trackSectionTime(currentSectionRef.current, timeSpent, scrollDepth);
-          }
+        // Track major scroll milestones
+        if (scrollPercent >= 25 && !sessionStorage.getItem('scroll_25')) {
+          sessionStorage.setItem('scroll_25', 'true');
+          trackInteraction('scroll', 'page', null, { percent: 25 });
+        } else if (scrollPercent >= 50 && !sessionStorage.getItem('scroll_50')) {
+          sessionStorage.setItem('scroll_50', 'true');
+          trackInteraction('scroll', 'page', null, { percent: 50 });
+        } else if (scrollPercent >= 75 && !sessionStorage.getItem('scroll_75')) {
+          sessionStorage.setItem('scroll_75', 'true');
+          trackInteraction('scroll', 'page', null, { percent: 75 });
+        } else if (scrollPercent >= 100 && !sessionStorage.getItem('scroll_100')) {
+          sessionStorage.setItem('scroll_100', 'true');
+          trackInteraction('scroll', 'page', null, { percent: 100 });
         }
 
-        // Start tracking new section
-        currentSectionRef.current = sectionInView;
-        sectionStartTimeRef.current = Date.now();
-      }
+        // Section-based tracking
+        const sectionInView = getSectionInView();
+
+        if (sectionInView && sectionInView !== currentSectionRef.current) {
+          // Track time for previous section
+          if (currentSectionRef.current && sectionStartTimeRef.current) {
+            const timeSpent = Math.round((Date.now() - sectionStartTimeRef.current) / 1000);
+            const scrollDepth = getSectionScrollDepth(currentSectionRef.current);
+
+            if (timeSpent > 0) {
+              trackSectionTime(currentSectionRef.current, timeSpent, scrollDepth);
+            }
+          }
+
+          // Start tracking new section
+          currentSectionRef.current = sectionInView;
+          sectionStartTimeRef.current = Date.now();
+        }
+      }, 250); // Throttle to 250ms
     };
 
     // Initial view tracking
     trackView();
+
+    // Initialize first section tracking
+    setTimeout(() => {
+      const initialSection = getSectionInView();
+      if (initialSection) {
+        currentSectionRef.current = initialSection;
+        sectionStartTimeRef.current = Date.now();
+      }
+    }, 100);
 
     // Add event listeners
     document.addEventListener('click', handleClick);
